@@ -44,59 +44,81 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
 
   return (
-    <div className={cn(
-      "sidebar-mobile bg-white spa-container-shadow lg:translate-x-0 lg:static lg:inset-0",
-      isOpen ? "" : "closed"
-    )}>
-      <div className="flex items-center justify-between h-16 px-6 border-b border-pink-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 spa-gradient rounded-lg flex items-center justify-center">
-            <Waves className="h-5 w-5 text-white" />
-          </div>
-          <h1 className="text-xl font-semibold text-slate-900">Serenity Spa</h1>
-        </div>
-        <button 
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="admin-sidebar-overlay"
           onClick={onClose}
-          className="lg:hidden text-slate-500 hover:text-slate-700"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
+        />
+      )}
       
-      <nav className="mt-6 px-3">
-        <div className="space-y-1">
-          {navigation.map((item) => {
-            const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
-            return (
-              <Link key={item.name} href={item.href}>
-                <span 
-                  className={cn(
-                    "spa-sidebar-item",
-                    isActive && "active"
-                  )}
-                  onClick={() => onClose()}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-        
-        <div className="mt-8 pt-6 border-t border-slate-200">
-          <div className="space-y-1">
-            {secondaryNavigation.map((item) => (
-              <Link key={item.name} href={item.href}>
-                <span className="spa-sidebar-item">
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </span>
-              </Link>
-            ))}
+      {/* Sidebar */}
+      <div className={cn(
+        "admin-sidebar shadow-lg",
+        !isOpen && "closed"
+      )}>
+        {/* Header */}
+        <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 bg-gradient-to-r from-primary/5 to-secondary/5">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 spa-gradient rounded-xl flex items-center justify-center shadow-lg">
+              <Waves className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900">Serenity Spa</h1>
+              <p className="text-xs text-slate-500 font-medium">Admin Dashboard</p>
+            </div>
           </div>
+          <button 
+            onClick={onClose}
+            className="lg:hidden text-slate-500 hover:text-slate-700 p-1 hover:bg-slate-100 rounded-md transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </nav>
-    </div>
+      
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 overflow-y-auto">
+          <div className="space-y-2">
+            {navigation.map((item) => {
+              const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
+              return (
+                <Link key={item.name} href={item.href}>
+                  <span 
+                    className={cn(
+                      "group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer",
+                      isActive 
+                        ? "bg-primary text-white shadow-lg shadow-primary/25" 
+                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-sm"
+                    )}
+                    onClick={() => onClose()}
+                  >
+                    <item.icon className={cn(
+                      "mr-3 h-5 w-5 transition-colors",
+                      isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600"
+                    )} />
+                    <span className="font-medium">{item.name}</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+          
+          {/* Secondary Navigation */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <div className="space-y-2">
+              {secondaryNavigation.map((item) => (
+                <Link key={item.name} href={item.href}>
+                  <span className="group flex items-center px-3 py-3 text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 cursor-pointer">
+                    <item.icon className="mr-3 h-5 w-5 text-slate-400 group-hover:text-red-500 transition-colors" />
+                    <span className="font-medium">{item.name}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </div>
+    </>
   );
 }

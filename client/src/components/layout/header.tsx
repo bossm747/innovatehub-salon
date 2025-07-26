@@ -11,23 +11,24 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
   return (
-    <div className="sticky top-0 z-40 bg-white border-b border-pink-200 spa-container-shadow">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <div className="admin-header shadow-sm bg-white/95 backdrop-blur-sm">
+      <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="flex justify-between items-center h-16 relative">
           <div className="flex items-center lg:hidden">
             <Button
               variant="ghost"
               size="sm"
               onClick={onMenuClick}
-              className="text-slate-500 hover:text-slate-700"
+              className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
             >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
           
-          {/* Centered Logo */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 hidden lg:block">
-            <SalonLogo className="float-animation" showSubtext />
+          {/* Desktop Title */}
+          <div className="hidden lg:block">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-slate-500">Manage your spa operations</p>
           </div>
           
           {/* Mobile Logo */}
