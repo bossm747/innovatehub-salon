@@ -77,16 +77,16 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Card className="spa-card-shadow">
-            <CardContent className="p-6">
+        <div className="grid-responsive-stats">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+            <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <CalendarCheck className="h-6 w-6 text-primary" />
+                <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                  <CalendarCheck className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">Today's Appointments</p>
-                  <p className="text-2xl font-semibold text-slate-900">
+                <div className="ml-4 lg:ml-6">
+                  <p className="text-responsive-sm font-medium text-slate-600">Today's Appointments</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-slate-900">
                     {(stats as any)?.todayAppointments || 0}
                   </p>
                 </div>
@@ -94,15 +94,15 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow">
-            <CardContent className="p-6">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+            <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-secondary/10 rounded-lg">
-                  <Banknote className="h-6 w-6 text-secondary" />
+                <div className="p-3 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
+                  <Banknote className="h-6 w-6 lg:h-8 lg:w-8 text-secondary" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">Daily Revenue</p>
-                  <p className="text-2xl font-semibold text-slate-900">
+                <div className="ml-4 lg:ml-6">
+                  <p className="text-responsive-sm font-medium text-slate-600">Daily Revenue</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-slate-900">
                     ₱{(stats as any)?.dailyRevenue || "0.00"}
                   </p>
                 </div>
@@ -110,15 +110,15 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow">
-            <CardContent className="p-6">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+            <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-accent/10 rounded-lg">
-                  <Users className="h-6 w-6 text-accent" />
+                <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
+                  <Users className="h-6 w-6 lg:h-8 lg:w-8 text-accent" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">Total Clients</p>
-                  <p className="text-2xl font-semibold text-slate-900">
+                <div className="ml-4 lg:ml-6">
+                  <p className="text-responsive-sm font-medium text-slate-600">Total Clients</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-slate-900">
                     {(stats as any)?.totalClients || 0}
                   </p>
                 </div>
@@ -126,15 +126,15 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow">
-            <CardContent className="p-6">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+            <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-orange-100 rounded-lg">
-                  <Star className="h-6 w-6 text-orange-600" />
+                <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
+                  <Star className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">Rating</p>
-                  <p className="text-2xl font-semibold text-slate-900">4.9</p>
+                <div className="ml-4 lg:ml-6">
+                  <p className="text-responsive-sm font-medium text-slate-600">Rating</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-slate-900">4.9</p>
                 </div>
               </div>
             </CardContent>
@@ -142,45 +142,45 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions & Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-12">
           {/* Quick Actions */}
           <div className="lg:col-span-1">
-            <Card className="spa-card-shadow">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-responsive-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-3 lg:space-y-4">
                   <Button 
-                    className="w-full justify-between bg-primary/10 hover:bg-primary/20 text-primary"
+                    className="w-full justify-between bg-primary/10 hover:bg-primary/20 text-primary py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                     variant="ghost"
                     onClick={() => setAppointmentModalOpen(true)}
                   >
                     <div className="flex items-center">
-                      <Plus className="mr-3 h-4 w-4" />
-                      <span>New Appointment</span>
+                      <Plus className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
+                      <span className="text-responsive-base font-medium">New Appointment</span>
                     </div>
                   </Button>
                   
                   <Button 
-                    className="w-full justify-between bg-secondary/10 hover:bg-secondary/20 text-secondary"
+                    className="w-full justify-between bg-secondary/10 hover:bg-secondary/20 text-secondary py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                     variant="ghost"
                     onClick={() => setClientModalOpen(true)}
                   >
                     <div className="flex items-center">
-                      <UserPlus className="mr-3 h-4 w-4" />
-                      <span>Add Client</span>
+                      <UserPlus className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
+                      <span className="text-responsive-base font-medium">Add Client</span>
                     </div>
                   </Button>
                   
                   <Button 
-                    className="w-full justify-between"
+                    className="w-full justify-between bg-accent/10 hover:bg-accent/20 text-accent py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                     variant="ghost"
                     onClick={() => window.location.href = '/appointments'}
                   >
                     <div className="flex items-center">
-                      <Calendar className="mr-3 h-4 w-4" />
-                      <span>View Calendar</span>
+                      <Calendar className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
+                      <span className="text-responsive-base font-medium">View Calendar</span>
                     </div>
                   </Button>
                 </div>
@@ -190,12 +190,12 @@ export default function Dashboard() {
 
           {/* Today's Schedule */}
           <div className="lg:col-span-2">
-            <Card className="spa-card-shadow">
-              <CardHeader>
-                <CardTitle>Today's Schedule</CardTitle>
+            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-responsive-lg">Today's Schedule</CardTitle>
               </CardHeader>
               <CardContent>
-                {!todayAppointments || (todayAppointments as any[])?.length === 0 ? (
+                {!todayAppointments || !Array.isArray(todayAppointments) || (todayAppointments as any[])?.length === 0 ? (
                   <div className="text-center py-8 text-slate-500">
                     <Calendar className="mx-auto h-12 w-12 text-slate-300 mb-4" />
                     <p>No appointments scheduled for today</p>
@@ -208,7 +208,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(todayAppointments as any[])?.map((appointment: any) => (
+                    {Array.isArray(todayAppointments) && (todayAppointments as any[])?.map((appointment: any) => (
                       <div key={appointment.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                         <div className="flex items-center space-x-4">
                           <div className="text-center">

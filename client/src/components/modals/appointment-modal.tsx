@@ -74,8 +74,8 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof appointmentFormSchema>) => {
-      const response = await apiRequest("POST", "/api/appointments", data);
-      return response.json();
+      const response = await apiRequest("/api/appointments", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
@@ -201,7 +201,7 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Therapist (Optional)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Any available" />
@@ -232,6 +232,7 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
                       placeholder="Any special requests or notes..."
                       className="resize-none"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />

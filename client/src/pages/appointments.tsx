@@ -81,7 +81,7 @@ export default function Appointments() {
             <p className="mt-2 text-responsive-base text-slate-600">Manage bookings and schedule appointments</p>
           </div>
           <Button 
-            className="button-responsive"
+            className="button-responsive bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
             onClick={() => setAppointmentModalOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -90,16 +90,16 @@ export default function Appointments() {
         </div>
 
         {/* Calendar View */}
-        <Card className="mb-8">
-          <CardHeader>
+        <Card className="mb-8 spa-card-shadow hover:shadow-lg transition-all duration-300">
+          <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <CardTitle>December 2024</CardTitle>
+              <CardTitle className="text-responsive-lg">December 2024</CardTitle>
               <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm">Today</Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="outline" size="sm" className="border-primary/20 hover:bg-primary/10">Today</Button>
+                <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -144,9 +144,9 @@ export default function Appointments() {
         </Card>
 
         {/* Appointments List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Appointments for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
+        <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-responsive-lg">Appointments for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
           </CardHeader>
           <CardContent>
             {!appointments || !Array.isArray(appointments) || appointments.length === 0 ? (
@@ -163,7 +163,7 @@ export default function Appointments() {
             ) : (
               <div className="space-y-4">
                 {Array.isArray(appointments) && appointments.map((appointment: any) => (
-                  <div key={appointment.id} className="p-6 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                  <div key={appointment.id} className="p-6 lg:p-8 border border-slate-200 rounded-xl hover:bg-slate-50 hover:shadow-md transition-all duration-300">
                     <div className="flex flex-col sm:flex-row justify-between items-start">
                       <div className="flex items-start space-x-4">
                         <div className="text-center min-w-0">
