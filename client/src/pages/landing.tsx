@@ -90,7 +90,14 @@ export default function Landing({ onEnter }: LandingProps) {
   return (
     <div className="min-h-screen text-slate-800">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-pink-100 via-orange-50 via-yellow-50 to-rose-100">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Salon Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/salon-bg-1.jpg)' }}
+        ></div>
+        <div className="absolute inset-0 bg-white/80"></div>
+        
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-pink-300 to-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
@@ -365,7 +372,13 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-rose-50">
+      <section className="relative py-20 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/salon-bg-2.jpg)' }}
+        ></div>
+        <div className="absolute inset-0 bg-pink-50/90"></div>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

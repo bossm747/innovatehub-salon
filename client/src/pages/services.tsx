@@ -53,7 +53,15 @@ export default function Services() {
 
   return (
     <>
-      <div className="space-y-6 sm:space-y-8">
+      <div className="relative min-h-screen">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/salon-bg-3.jpg)' }}
+        ></div>
+        <div className="absolute inset-0 bg-white/90"></div>
+        
+        <div className="relative z-10 space-y-6 sm:space-y-8 p-4">
         <div className="flex-responsive justify-between">
           <div>
             <h2 className="text-responsive-lg font-bold text-slate-900">Services</h2>
@@ -143,6 +151,7 @@ export default function Services() {
             ))}
           </div>
         )}
+        </div>
       </div>
 
       <ServiceModal 

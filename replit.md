@@ -11,6 +11,11 @@ This is a comprehensive salon and spa management platform for JustPause Salon & 
 - Applied consistent Inter font typography with uppercase and wide letter spacing
 - Updated database settings and notification preferences
 - Logo now properly renders from /justpause-logo.png in public directory
+- Added handwritten "JustPause Salon & Spa" text using Great Vibes font alongside logo
+- Integrated WhatsApp contact (+971 50 290 0752) and Facebook page reference
+- Updated contact information to Dubai, UAE location
+- Added salon background images across key pages (landing, services, appointments, clients)
+- Implemented opaque background overlays for better readability
 
 ## User Preferences
 
