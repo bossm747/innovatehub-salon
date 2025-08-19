@@ -110,7 +110,7 @@ export default function Landing({ onEnter }: LandingProps) {
             <div className="mb-8">
               <div className="flex items-center justify-center mb-6">
                 <motion.img
-                  src="/attached_assets/Justpause_1755592468640.png"
+                  src="/justpause-logo.png"
                   alt="JustPause Salon & Spa"
                   className="h-32 md:h-40 w-auto"
                   initial={{ scale: 0.8, opacity: 0 }}

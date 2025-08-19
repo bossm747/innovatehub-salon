@@ -28,7 +28,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
           {/* Desktop Title */}
           <div className="hidden lg:block">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-slate-500">Manage your spa operations</p>
+            <p className="text-sm text-slate-500">Manage your JustPause operations</p>
           </div>
           
           {/* Mobile Logo */}

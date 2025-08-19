@@ -74,7 +74,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           >
             <div className="relative flex flex-col items-center">
               <motion.img
-                src="/attached_assets/Justpause_1755592468640.png"
+                src="/justpause-logo.png"
                 alt="JustPause Salon & Spa"
                 className="h-24 md:h-32 w-auto mb-4"
                 initial={{ scale: 0.5, opacity: 0 }}

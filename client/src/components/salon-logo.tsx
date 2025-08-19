@@ -73,7 +73,7 @@ export default function SalonLogo({
       {showImage && (
         <div className="mb-2">
           <img 
-            src="/attached_assets/Justpause_1755592468640.png" 
+            src="/justpause-logo.png" 
             alt="JustPause Salon & Spa" 
             className={sizeClasses.image}
           />
