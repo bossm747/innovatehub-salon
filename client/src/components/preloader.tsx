@@ -76,36 +76,22 @@ export default function Preloader({ onComplete }: PreloaderProps) {
               <motion.img
                 src="/justpause-logo.png"
                 alt="JustPause Salon & Spa"
-                className="h-24 md:h-32 w-auto mb-4"
+                className="h-40 md:h-48 w-auto mb-4"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
-              <motion.h1
-                className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-slate-700 via-slate-500 to-slate-600 tracking-widest"
+              <motion.p
+                className="text-xl md:text-2xl text-slate-600 mt-2 font-light tracking-wide"
                 style={{ 
                   fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
-                  letterSpacing: "0.15em"
+                  letterSpacing: "0.08em"
                 }}
-                animate={{
-                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              >
-                JUSTPAUSE
-              </motion.h1>
-              <motion.p
-                className="text-2xl md:text-3xl text-slate-600 mt-2"
-                style={{ fontFamily: "'Dancing Script', cursive" }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                Salon & Spa
+                SALON & SPA
               </motion.p>
               
               {/* Sparkle Effects */}

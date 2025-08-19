@@ -4,12 +4,22 @@
 
 This is a comprehensive salon and spa management platform for JustPause Salon & Spa, built with a modern React frontend and Express.js backend, specifically localized for the Philippine market. The application manages clients, staff, services, and appointments for spa/salon businesses. It features a clean, professional interface using ShadCN UI components with Philippine Peso (₱) currency support and follows a full-stack TypeScript architecture.
 
+## Recent Changes (August 19, 2025)
+- Complete rebranding from "Serenity Spa" to "JustPause Salon & Spa"
+- Updated logo throughout the application with larger, more prominent display
+- Removed text overlays from logo component for cleaner appearance
+- Applied consistent Inter font typography with uppercase and wide letter spacing
+- Updated database settings and notification preferences
+- Logo now properly renders from /justpause-logo.png in public directory
+
 ## User Preferences
 
 - Preferred communication style: Simple, everyday language
 - Market focus: Philippine spa/salon businesses
 - Currency: Philippine Peso (₱) instead of USD ($)
 - Features requested: Comprehensive feature suggestions for Filipino market
+- Branding: JustPause Salon & Spa with clean logo-only approach (no text overlay)
+- Logo preference: Larger logo images without additional text styling
 
 ## System Architecture
 
