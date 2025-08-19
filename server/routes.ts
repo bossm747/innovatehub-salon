@@ -715,26 +715,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard stats
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
-      const today = new Date().toISOString().split('T')[0];
-      const todayAppointments = await storage.getAppointmentsByDate(today);
-      const allClients = await storage.getClients();
-      const allAppointments = await storage.getAppointments();
-      
-      // Calculate basic stats
-      const dailyRevenue = todayAppointments.reduce((sum, apt) => {
-        return sum + parseFloat(apt.totalAmount || "0");
-      }, 0);
-
-      const stats = {
-        todayAppointments: todayAppointments.length,
-        dailyRevenue: dailyRevenue.toFixed(2),
-        totalClients: allClients.length,
-        totalAppointments: allAppointments.length,
-      };
-
+      const stats = await storage.getDashboardStats();
       res.json(stats);
     } catch (error) {
+      console.error('Dashboard Stats Error:', error);
       res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Marketing stats endpoint
+  app.get("/api/marketing/stats", async (req, res) => {
+    try {
+      const stats = await storage.getMarketingStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Marketing Stats Error:', error);
+      res.status(500).json({ message: "Failed to fetch marketing stats" });
     }
   });
 

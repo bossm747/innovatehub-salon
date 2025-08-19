@@ -142,6 +142,20 @@ export interface IStorage {
     clickRate: number;
     conversionRate: number;
   }>;
+
+  // Dashboard Stats
+  getDashboardStats(): Promise<{
+    todayAppointments: number;
+    dailyRevenue: number;
+    monthlyRevenue: number;
+    totalClients: number;
+    totalServices: number;
+    totalStaff: number;
+    recentAppointments: any[];
+    upcomingAppointments: any[];
+    lowStockProducts: any[];
+    topServices: any[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -646,6 +660,132 @@ export class DatabaseStorage implements IStorage {
       openRate: 68.5,
       clickRate: 12.3,
       conversionRate: 4.8,
+    };
+  }
+
+  async getDashboardStats(): Promise<{
+    todayAppointments: number;
+    dailyRevenue: number;
+    monthlyRevenue: number;
+    totalClients: number;
+    totalServices: number;
+    totalStaff: number;
+    recentAppointments: any[];
+    upcomingAppointments: any[];
+    lowStockProducts: any[];
+    topServices: any[];
+  }> {
+    const today = new Date().toISOString().split('T')[0];
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
+
+    // Get today's appointments with client and service names
+    const todayAppointments = await this.getAppointmentsByDate(today);
+    
+    // Get monthly appointments for revenue calculation
+    const monthlyAppointments = await db
+      .select({
+        totalAmount: appointments.totalAmount,
+      })
+      .from(appointments)
+      .where(
+        and(
+          sql`${appointments.date} >= ${startOfMonth}`,
+          sql`${appointments.date} <= ${endOfMonth}`
+        )
+      );
+
+    // Calculate revenues
+    const dailyRevenue = todayAppointments.reduce((sum, apt) => {
+      return sum + parseFloat(apt.totalAmount || "0");
+    }, 0);
+
+    const monthlyRevenue = monthlyAppointments.reduce((sum, apt) => {
+      return sum + parseFloat(apt.totalAmount || "0");
+    }, 0);
+
+    // Get totals
+    const [clientCount] = await db.select({ count: sql<number>`count(*)` }).from(clients);
+    const [serviceCount] = await db.select({ count: sql<number>`count(*)` }).from(services);
+    const [staffCount] = await db.select({ count: sql<number>`count(*)` }).from(staff);
+
+    // Get recent appointments (last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentAppointments = await db
+      .select({
+        id: appointments.id,
+        date: appointments.date,
+        time: appointments.time,
+        clientName: clients.name,
+        serviceName: services.name,
+        status: appointments.status,
+        totalAmount: appointments.totalAmount,
+      })
+      .from(appointments)
+      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(services, eq(appointments.serviceId, services.id))
+      .where(sql`${appointments.date} >= ${sevenDaysAgo.toISOString().split('T')[0]}`)
+      .orderBy(desc(appointments.createdAt))
+      .limit(5);
+
+    // Get upcoming appointments (next 7 days)
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+    const upcomingAppointments = await db
+      .select({
+        id: appointments.id,
+        date: appointments.date,
+        time: appointments.time,
+        clientName: clients.name,
+        serviceName: services.name,
+        status: appointments.status,
+        totalAmount: appointments.totalAmount,
+      })
+      .from(appointments)
+      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(services, eq(appointments.serviceId, services.id))
+      .where(
+        and(
+          sql`${appointments.date} >= ${today}`,
+          sql`${appointments.date} <= ${sevenDaysFromNow.toISOString().split('T')[0]}`,
+          eq(appointments.status, 'confirmed')
+        )
+      )
+      .orderBy(appointments.date, appointments.time)
+      .limit(5);
+
+    // Get low stock products
+    const lowStockProducts = await this.getLowStockProducts();
+
+    // Get top services (most booked in last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const topServices = await db
+      .select({
+        serviceId: appointments.serviceId,
+        serviceName: services.name,
+        bookingCount: sql<number>`count(*)`,
+        revenue: sql<number>`sum(${appointments.totalAmount})`,
+      })
+      .from(appointments)
+      .leftJoin(services, eq(appointments.serviceId, services.id))
+      .where(sql`${appointments.date} >= ${thirtyDaysAgo.toISOString().split('T')[0]}`)
+      .groupBy(appointments.serviceId, services.name)
+      .orderBy(sql`count(*) desc`)
+      .limit(5);
+
+    return {
+      todayAppointments: todayAppointments.length,
+      dailyRevenue,
+      monthlyRevenue,
+      totalClients: clientCount?.count || 0,
+      totalServices: serviceCount?.count || 0,
+      totalStaff: staffCount?.count || 0,
+      recentAppointments,
+      upcomingAppointments,
+      lowStockProducts: lowStockProducts.slice(0, 5),
+      topServices,
     };
   }
 

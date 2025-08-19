@@ -240,13 +240,10 @@ export default function Marketing() {
     }
   };
 
-  const mockStats = {
-    totalCampaigns: campaigns.length || 0,
-    totalSent: 1250,
-    openRate: 68.5,
-    clickRate: 12.3,
-    conversionRate: 4.8,
-  };
+  const { data: marketingStats } = useQuery({
+    queryKey: ["/api/marketing/stats"],
+    queryFn: () => fetch("/api/marketing/stats").then(res => res.json()),
+  });
 
   return (
     <div className="space-y-6">
@@ -436,7 +433,7 @@ export default function Marketing() {
               <Mail className="h-8 w-8 text-pink-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Total Campaigns</p>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.totalCampaigns}</p>
+                <p className="text-2xl font-bold text-slate-900">{marketingStats?.totalCampaigns || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -448,7 +445,7 @@ export default function Marketing() {
               <Send className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Emails Sent</p>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.totalSent.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-slate-900">{marketingStats?.totalSent?.toLocaleString() || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -460,7 +457,7 @@ export default function Marketing() {
               <Eye className="h-8 w-8 text-yellow-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Open Rate</p>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.openRate}%</p>
+                <p className="text-2xl font-bold text-slate-900">{marketingStats?.openRate || 0}%</p>
               </div>
             </div>
           </CardContent>
@@ -472,7 +469,7 @@ export default function Marketing() {
               <Target className="h-8 w-8 text-green-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Click Rate</p>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.clickRate}%</p>
+                <p className="text-2xl font-bold text-slate-900">{marketingStats?.clickRate || 0}%</p>
               </div>
             </div>
           </CardContent>
@@ -484,7 +481,7 @@ export default function Marketing() {
               <TrendingUp className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Conversion Rate</p>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.conversionRate}%</p>
+                <p className="text-2xl font-bold text-slate-900">{marketingStats?.conversionRate || 0}%</p>
               </div>
             </div>
           </CardContent>

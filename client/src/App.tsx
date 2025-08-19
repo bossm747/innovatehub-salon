@@ -71,33 +71,33 @@ function App() {
     return <Preloader onComplete={handlePreloaderComplete} />;
   }
 
-  if (appState === 'landing') {
-    return <Landing onEnter={handleEnterApp} />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen spa-background">
-          {/* Sidebar */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          
-          {/* Main content area */}
-          <div className="admin-main-content">
-            {/* Header */}
-            <Header 
-              onMenuClick={() => setSidebarOpen(true)} 
-              onDocsClick={() => setShowDocs(true)}
-            />
+        {appState === 'landing' ? (
+          <Landing onEnter={handleEnterApp} />
+        ) : (
+          <div className="min-h-screen spa-background">
+            {/* Sidebar */}
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             
-            {/* Page content */}
-            <main className="p-4 sm:p-6 lg:p-8 xl:p-12 max-w-full overflow-x-hidden bg-slate-50/30">
-              <div className="container-responsive">
-                <Router showDocs={showDocs} setShowDocs={setShowDocs} />
-              </div>
-            </main>
+            {/* Main content area */}
+            <div className="admin-main-content">
+              {/* Header */}
+              <Header 
+                onMenuClick={() => setSidebarOpen(true)} 
+                onDocsClick={() => setShowDocs(true)}
+              />
+              
+              {/* Page content */}
+              <main className="p-4 sm:p-6 lg:p-8 xl:p-12 max-w-full overflow-x-hidden bg-slate-50/30">
+                <div className="container-responsive">
+                  <Router showDocs={showDocs} setShowDocs={setShowDocs} />
+                </div>
+              </main>
+            </div>
           </div>
-        </div>
+        )}
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

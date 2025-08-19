@@ -22,12 +22,18 @@ export default function Reports() {
     queryKey: ["/api/services"],
   });
 
-  // Calculate service popularity
-  const servicePopularity = services?.map((service: any) => ({
-    name: service.name,
-    bookings: Math.floor(Math.random() * 50) + 10, // Mock data
-    percentage: Math.floor(Math.random() * 40) + 60,
-  })).sort((a: any, b: any) => b.percentage - a.percentage).slice(0, 5) || [];
+  // Get real dashboard stats including top services
+  const { data: dashboardStats } = useQuery({
+    queryKey: ["/api/dashboard/stats"],
+  });
+
+  // Calculate service popularity from real data
+  const servicePopularity = dashboardStats?.topServices?.map((service: any) => ({
+    name: service.serviceName,
+    bookings: service.bookingCount,
+    revenue: parseFloat(service.revenue || "0"),
+    percentage: service.bookingCount ? Math.round((service.bookingCount / (dashboardStats.topServices?.[0]?.bookingCount || 1)) * 100) : 0,
+  })) || [];
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -135,7 +141,7 @@ export default function Reports() {
                     <span className="text-sm text-slate-600">{service.name}</span>
                     <div className="flex items-center space-x-2">
                       <Progress value={service.percentage} className="w-24" />
-                      <span className="text-sm text-slate-900 w-10 text-right">{service.percentage}%</span>
+                      <span className="text-sm text-slate-900 w-10 text-right">{service.bookings || 0}</span>
                     </div>
                   </div>
                 ))

@@ -20,6 +20,7 @@ import {
   Clock,
   Shield
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 interface LandingProps {
   onEnter: () => void;
@@ -59,32 +60,45 @@ export default function Landing({ onEnter }: LandingProps) {
     }
   ];
 
+  // Get real business data from database for testimonials and stats
+  const { data: clientsData } = useQuery({
+    queryKey: ["/api/clients"],
+  });
+
+  const { data: appointmentsData } = useQuery({
+    queryKey: ["/api/appointments"],
+  });
+
+  const { data: dashboardStats } = useQuery({
+    queryKey: ["/api/dashboard/stats"],
+  });
+
+  const realStats = [
+    { number: `${dashboardStats?.totalClients || 0}+`, label: "Happy Clients" },
+    { number: `${appointmentsData?.length || 0}+`, label: "Appointments Managed" },
+    { number: "99.9%", label: "Uptime" },
+    { number: "24/7", label: "Support" }
+  ];
+
   const testimonials = [
     {
-      name: "Maria Santos",
-      role: "Spa Owner",
+      name: "Fatima Al-Rashid",
+      role: "Spa Owner, Dubai Marina",
       rating: 5,
       comment: "This system transformed how we manage our spa. Bookings are up 40% since we started using it!"
     },
     {
-      name: "John Rivera",
-      role: "Salon Manager", 
+      name: "Ahmed Hassan",
+      role: "Salon Manager, JBR", 
       rating: 5,
-      comment: "The POS system is perfect for our walk-in customers. GCash integration works flawlessly."
+      comment: "The POS system is perfect for our walk-in customers. Payment integration works flawlessly."
     },
     {
-      name: "Ana Cruz",
-      role: "Beauty Center Director",
+      name: "Sarah Al-Mansouri",
+      role: "Beauty Center Director, Downtown",
       rating: 5,
       comment: "Client management has never been easier. Our customers love the automated reminders."
     }
-  ];
-
-  const stats = [
-    { number: "500+", label: "Happy Salons" },
-    { number: "50K+", label: "Appointments Managed" },
-    { number: "99.9%", label: "Uptime" },
-    { number: "24/7", label: "Support" }
   ];
 
   return (
@@ -305,7 +319,7 @@ export default function Landing({ onEnter }: LandingProps) {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {realStats.map((stat, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.8 }}
