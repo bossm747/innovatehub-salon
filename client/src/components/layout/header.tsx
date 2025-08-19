@@ -75,31 +75,15 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         </div>
       </div>
       
-      {/* Large Logo Section Below Header */}
-      <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200/60 py-6">
+      {/* Logo Only Section Below Header */}
+      <div className="bg-transparent py-6">
         <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex justify-center">
-            <div className="flex items-center gap-6">
-              <img 
-                src="/justpause-logo.png" 
-                alt="JustPause Salon & Spa" 
-                className="h-20 md:h-24 lg:h-28 w-auto drop-shadow-sm"
-              />
-              <div className="text-center">
-                <h1 
-                  className="text-2xl md:text-3xl lg:text-4xl text-slate-800 font-normal leading-tight"
-                  style={{
-                    fontFamily: "'Great Vibes', 'Dancing Script', cursive",
-                    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  JustPause Salon & Spa
-                </h1>
-                <p className="text-sm md:text-base text-slate-500 mt-1 font-medium tracking-wider uppercase">
-                  Management System
-                </p>
-              </div>
-            </div>
+            <img 
+              src="/justpause-logo.png" 
+              alt="JustPause Salon & Spa" 
+              className="h-24 md:h-32 lg:h-40 w-auto"
+            />
           </div>
         </div>
       </div>
