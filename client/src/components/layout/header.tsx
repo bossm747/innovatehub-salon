@@ -11,67 +11,98 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
   return (
-    <div className="admin-header shadow-sm bg-white/95 backdrop-blur-sm">
-      <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
-        <div className="flex justify-between items-center h-16 relative">
-          <div className="flex items-center lg:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onMenuClick}
-              className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          {/* Desktop Title */}
-          <div className="hidden lg:block">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-slate-500">Manage your JustPause operations</p>
-          </div>
-          
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex-1 flex justify-center">
-            <SalonLogo className="float-animation" size="sm" />
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="hidden sm:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                <Input
-                  type="text"
-                  placeholder="Search clients, appointments..."
-                  className="w-64 pl-10"
-                />
-              </div>
+    <>
+      <div className="admin-header shadow-sm bg-white/95 backdrop-blur-sm">
+        <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="flex justify-between items-center h-16 relative">
+            <div className="flex items-center lg:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onMenuClick}
+                className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
             </div>
             
-            {onDocsClick && (
-              <Button variant="ghost" size="sm" onClick={onDocsClick} className="text-slate-400 hover:text-slate-700">
-                <Book className="h-5 w-5" />
-              </Button>
-            )}
+            {/* Desktop Title */}
+            <div className="hidden lg:block">
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+              <p className="text-sm text-slate-500">Manage your JustPause operations</p>
+            </div>
             
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5 text-slate-400" />
-              <span className="absolute top-1 right-1 block h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
+            {/* Mobile Logo */}
+            <div className="lg:hidden flex-1 flex justify-center">
+              <SalonLogo className="float-animation" size="sm" />
+            </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:block text-right">
-                <div className="text-sm font-medium text-slate-900">Sarah Johnson</div>
-                <div className="text-xs text-slate-500">Manager</div>
+            <div className="flex items-center space-x-4">
+              <div className="hidden sm:block">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search clients, appointments..."
+                    className="w-64 pl-10"
+                  />
+                </div>
               </div>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" />
-                <AvatarFallback>SJ</AvatarFallback>
-              </Avatar>
+              
+              {onDocsClick && (
+                <Button variant="ghost" size="sm" onClick={onDocsClick} className="text-slate-400 hover:text-slate-700">
+                  <Book className="h-5 w-5" />
+                </Button>
+              )}
+              
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-5 w-5 text-slate-400" />
+                <span className="absolute top-1 right-1 block h-2 w-2 bg-red-500 rounded-full"></span>
+              </Button>
+              
+              <div className="flex items-center space-x-3">
+                <div className="hidden sm:block text-right">
+                  <div className="text-sm font-medium text-slate-900">Sarah Johnson</div>
+                  <div className="text-xs text-slate-500">Manager</div>
+                </div>
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" />
+                  <AvatarFallback>SJ</AvatarFallback>
+                </Avatar>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      
+      {/* Large Logo Section Below Header */}
+      <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200/60 py-6">
+        <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="flex justify-center">
+            <div className="flex items-center gap-6">
+              <img 
+                src="/justpause-logo.png" 
+                alt="JustPause Salon & Spa" 
+                className="h-20 md:h-24 lg:h-28 w-auto drop-shadow-sm"
+              />
+              <div className="text-center">
+                <h1 
+                  className="text-2xl md:text-3xl lg:text-4xl text-slate-800 font-normal leading-tight"
+                  style={{
+                    fontFamily: "'Great Vibes', 'Dancing Script', cursive",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  JustPause Salon & Spa
+                </h1>
+                <p className="text-sm md:text-base text-slate-500 mt-1 font-medium tracking-wider uppercase">
+                  Management System
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
