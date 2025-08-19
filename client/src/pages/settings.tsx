@@ -76,6 +76,7 @@ const profileSchema = z.object({
     facebook: z.string().optional(),
     instagram: z.string().optional(),
     tiktok: z.string().optional(),
+    whatsapp: z.string().optional(),
   }).optional(),
 });
 
@@ -509,8 +510,8 @@ export default function Settings() {
                   />
 
                   <div className="space-y-4">
-                    <FormLabel>Social Media</FormLabel>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormLabel>Social Media & Contact</FormLabel>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={profileForm.control}
                         name="socialMedia.facebook"
@@ -547,6 +548,20 @@ export default function Settings() {
                             <FormLabel>TikTok</FormLabel>
                             <FormControl>
                               <Input placeholder="TikTok URL" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={profileForm.control}
+                        name="socialMedia.whatsapp"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>WhatsApp</FormLabel>
+                            <FormControl>
+                              <Input placeholder="WhatsApp number (e.g., +971 50 290 0752)" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
