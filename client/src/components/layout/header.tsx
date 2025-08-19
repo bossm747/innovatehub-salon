@@ -75,17 +75,13 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         </div>
       </div>
       
-      {/* Logo Only Section Below Header */}
-      <div className="bg-transparent py-6">
-        <div className="px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="flex justify-center">
-            <img 
-              src="/justpause-logo.png" 
-              alt="JustPause Salon & Spa" 
-              className="h-24 md:h-32 lg:h-40 w-auto"
-            />
-          </div>
-        </div>
+      {/* Floating Logo */}
+      <div className="flex justify-center">
+        <img 
+          src="/justpause-logo.png" 
+          alt="JustPause Salon & Spa" 
+          className="h-48 md:h-64 lg:h-80 w-auto"
+        />
       </div>
     </>
   );
