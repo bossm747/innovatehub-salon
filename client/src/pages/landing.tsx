@@ -108,23 +108,33 @@ export default function Landing({ onEnter }: LandingProps) {
           >
             {/* Logo */}
             <div className="mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <motion.img
+                  src="@assets/Justpause_1755592468640.png"
+                  alt="JustPause Salon & Spa"
+                  className="h-32 md:h-40 w-auto"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              </div>
               <motion.h1
-                className="text-7xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 mb-4"
+                className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 mb-4"
                 style={{ fontFamily: "'Dancing Script', cursive" }}
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
               >
-                Serenity
+                JustPause
               </motion.h1>
               <motion.p
                 className="text-3xl md:text-4xl text-slate-600"
                 style={{ fontFamily: "'Dancing Script', cursive" }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
               >
-                Spa & Salon Management System
+                Salon & Spa Management System
               </motion.p>
             </div>
 
@@ -379,7 +389,7 @@ export default function Landing({ onEnter }: LandingProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'Dancing Script', cursive" }}>
-                Serenity Spa & Salon
+                JustPause Salon & Spa
               </h3>
               <p className="text-slate-300 leading-relaxed">
                 Complete management solution for Philippine beauty businesses. 

@@ -43,8 +43,8 @@ export async function sendAppointmentNotification(
       .limit(1);
 
     const spaSettings = settings[0] || {
-      spaName: "Serenity Spa",
-      spaEmail: "noreply@serenityspa.ph",
+      spaName: "JustPause Salon & Spa",
+      spaEmail: "noreply@justpause.ph",
       emailEnabled: true,
       confirmationEnabled: true,
       reminderEnabled: true,

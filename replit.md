@@ -1,8 +1,8 @@
-# Spa/Salon Management System
+# JustPause Salon & Spa Management System
 
 ## Overview
 
-This is a comprehensive spa/salon management system built with a modern React frontend and Express.js backend, specifically localized for the Philippine market. The application manages clients, staff, services, and appointments for spa/salon businesses. It features a clean, professional interface using ShadCN UI components with Philippine Peso (₱) currency support and follows a full-stack TypeScript architecture.
+This is a comprehensive salon and spa management platform for JustPause Salon & Spa, built with a modern React frontend and Express.js backend, specifically localized for the Philippine market. The application manages clients, staff, services, and appointments for spa/salon businesses. It features a clean, professional interface using ShadCN UI components with Philippine Peso (₱) currency support and follows a full-stack TypeScript architecture.
 
 ## User Preferences
 

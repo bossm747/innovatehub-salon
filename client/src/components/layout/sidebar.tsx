@@ -13,9 +13,9 @@ import {
   BarChart3,
   Settings, 
   LogOut,
-  Waves,
   X
 } from "lucide-react";
+import SalonLogo from "@/components/salon-logo";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -61,13 +61,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 bg-gradient-to-r from-primary/5 to-secondary/5">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 spa-gradient rounded-xl flex items-center justify-center shadow-lg">
-              <Waves className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-900">Serenity Spa</h1>
-              <p className="text-xs text-slate-500 font-medium">Admin Dashboard</p>
-            </div>
+            <SalonLogo size="sm" showSubtext={false} showImage={true} />
           </div>
           <button 
             onClick={onClose}

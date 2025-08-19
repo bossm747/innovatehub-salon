@@ -1,18 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Heart } from "lucide-react";
+import logoImage from "@assets/Justpause_1755592468640.png";
 
 interface SalonLogoProps {
   className?: string;
   showSubtext?: boolean;
+  size?: "sm" | "md" | "lg";
+  showImage?: boolean;
 }
 
-export default function SalonLogo({ className = "", showSubtext = false }: SalonLogoProps) {
+export default function SalonLogo({ 
+  className = "", 
+  showSubtext = false, 
+  size = "md",
+  showImage = true 
+}: SalonLogoProps) {
   const { data: profileData } = useQuery({
     queryKey: ["/api/settings/profile"],
   });
 
-  const businessName = profileData?.businessName || "Elegant Spa";
-  const businessType = profileData?.businessType || "spa";
+  const businessName = (profileData as any)?.businessName || "JustPause";
+  const businessType = (profileData as any)?.businessType || "both";
 
   const getSubtext = () => {
     switch (businessType) {
@@ -21,11 +29,36 @@ export default function SalonLogo({ className = "", showSubtext = false }: Salon
       case "salon":
         return "Hair & Beauty";
       case "both":
-        return "Spa & Salon";
+        return "Salon & Spa";
       default:
         return "Beauty & Wellness";
     }
   };
+
+  const getSizeClasses = () => {
+    switch (size) {
+      case "sm":
+        return {
+          image: "h-8 w-auto",
+          text: "text-lg",
+          subtext: "text-xs"
+        };
+      case "lg":
+        return {
+          image: "h-16 md:h-20 w-auto",
+          text: "text-3xl md:text-4xl",
+          subtext: "text-sm"
+        };
+      default:
+        return {
+          image: "h-10 md:h-12 w-auto",
+          text: "text-xl md:text-2xl",
+          subtext: "text-xs"
+        };
+    }
+  };
+
+  const sizeClasses = getSizeClasses();
 
   return (
     <div className={`relative flex flex-col items-center ${className}`}>
@@ -37,10 +70,21 @@ export default function SalonLogo({ className = "", showSubtext = false }: Salon
         <Sparkles className="h-3 w-3" />
       </div>
       
+      {/* Logo Image */}
+      {showImage && (
+        <div className="mb-2">
+          <img 
+            src={logoImage} 
+            alt="JustPause Salon & Spa" 
+            className={sizeClasses.image}
+          />
+        </div>
+      )}
+      
       {/* Main logo text */}
       <div className="relative">
         <h1 
-          className="handwritten-logo text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-bold tracking-wide"
+          className={`handwritten-logo text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-bold tracking-wide ${sizeClasses.text}`}
           style={{
             fontFamily: "'Dancing Script', cursive",
             textShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -55,7 +99,7 @@ export default function SalonLogo({ className = "", showSubtext = false }: Salon
       
       {/* Subtext */}
       {showSubtext && (
-        <p className="text-xs text-slate-500 mt-1 font-medium tracking-wider uppercase">
+        <p className={`text-slate-500 mt-1 font-medium tracking-wider uppercase ${sizeClasses.subtext}`}>
           {getSubtext()}
         </p>
       )}

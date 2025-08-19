@@ -154,7 +154,7 @@ export const timeRecords = pgTable("time_records", {
 // Notification Settings
 export const notificationSettings = pgTable("notification_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  spaName: text("spa_name").notNull().default("Serenity Spa"),
+  spaName: text("spa_name").notNull().default("JustPause Salon & Spa"),
   spaEmail: text("spa_email").notNull(),
   spaPhone: text("spa_phone"),
   emailEnabled: boolean("email_enabled").default(true),
