@@ -82,7 +82,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
               <motion.h1
-                className="text-3xl md:text-4xl text-slate-800 font-normal leading-tight"
+                className="text-2xl md:text-4xl text-slate-800 font-normal leading-tight text-center"
                 style={{
                   fontFamily: "'Great Vibes', 'Dancing Script', cursive",
                   textShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -91,7 +91,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
               >
-                JustPause<br/>Salon & Spa
+                JustPause<br className="sm:hidden"/>
+                <span className="hidden sm:inline"> </span>
+                Salon & Spa
               </motion.h1>
               
               {/* Sparkle Effects */}

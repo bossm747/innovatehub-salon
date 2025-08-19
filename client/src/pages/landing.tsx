@@ -118,7 +118,7 @@ export default function Landing({ onEnter }: LandingProps) {
                   transition={{ duration: 1, ease: "easeOut" }}
                 />
                 <motion.h1
-                  className="text-4xl md:text-6xl text-slate-800 font-normal leading-tight"
+                  className="text-3xl sm:text-4xl md:text-6xl text-slate-800 font-normal leading-tight text-center"
                   style={{
                     fontFamily: "'Great Vibes', 'Dancing Script', cursive",
                     textShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -127,7 +127,9 @@ export default function Landing({ onEnter }: LandingProps) {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                 >
-                  JustPause Salon & Spa
+                  JustPause<br className="sm:hidden"/>
+                  <span className="hidden sm:inline"> </span>
+                  Salon & Spa
                 </motion.h1>
               </div>
               <motion.p

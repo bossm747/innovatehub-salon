@@ -38,8 +38,8 @@ export default function SalonLogo({
     switch (size) {
       case "sm":
         return {
-          image: "h-12 w-auto",
-          text: "text-2xl",
+          image: "h-10 w-auto",
+          text: "text-lg md:text-xl",
           subtext: "text-xs"
         };
       case "lg":
@@ -60,7 +60,7 @@ export default function SalonLogo({
   const sizeClasses = getSizeClasses();
 
   return (
-    <div className={`relative flex items-center justify-center gap-4 ${className}`}>
+    <div className={`relative flex items-center justify-center gap-2 md:gap-4 ${className}`}>
       {/* Logo Image */}
       <div>
         <img 
