@@ -39,19 +39,19 @@ export default function SalonLogo({
       case "sm":
         return {
           image: "h-12 w-auto",
-          text: "text-lg",
+          text: "text-2xl",
           subtext: "text-xs"
         };
       case "lg":
         return {
           image: "h-24 md:h-32 w-auto",
-          text: "text-3xl md:text-4xl",
+          text: "text-4xl md:text-5xl",
           subtext: "text-sm"
         };
       default:
         return {
           image: "h-16 md:h-20 w-auto",
-          text: "text-xl md:text-2xl",
+          text: "text-3xl md:text-4xl",
           subtext: "text-xs"
         };
     }
@@ -60,8 +60,8 @@ export default function SalonLogo({
   const sizeClasses = getSizeClasses();
 
   return (
-    <div className={`relative flex flex-col items-center ${className}`}>
-      {/* Logo Image - Now takes all space */}
+    <div className={`relative flex items-center justify-center gap-4 ${className}`}>
+      {/* Logo Image */}
       <div>
         <img 
           src="/justpause-logo.png" 
@@ -70,12 +70,25 @@ export default function SalonLogo({
         />
       </div>
       
-      {/* Subtext - Only show if explicitly requested */}
-      {showSubtext && (
-        <p className={`text-slate-500 mt-2 font-medium tracking-wider uppercase ${sizeClasses.subtext}`}>
-          {getSubtext()}
-        </p>
-      )}
+      {/* Handwritten Text Title */}
+      <div className="flex flex-col">
+        <h1 
+          className={`text-slate-800 font-normal leading-tight ${sizeClasses.text}`}
+          style={{
+            fontFamily: "'Great Vibes', 'Dancing Script', cursive",
+            textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+          }}
+        >
+          JustPause Salon & Spa
+        </h1>
+        
+        {/* Subtext - Only show if explicitly requested */}
+        {showSubtext && (
+          <p className={`text-slate-500 mt-1 font-medium tracking-wider uppercase ${sizeClasses.subtext}`}>
+            {getSubtext()}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

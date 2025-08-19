@@ -108,15 +108,27 @@ export default function Landing({ onEnter }: LandingProps) {
           >
             {/* Logo */}
             <div className="mb-8">
-              <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center justify-center gap-6 mb-6">
                 <motion.img
                   src="/justpause-logo.png"
                   alt="JustPause Salon & Spa"
-                  className="h-48 md:h-64 w-auto"
+                  className="h-32 md:h-40 w-auto"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1, ease: "easeOut" }}
                 />
+                <motion.h1
+                  className="text-4xl md:text-6xl text-slate-800 font-normal leading-tight"
+                  style={{
+                    fontFamily: "'Great Vibes', 'Dancing Script', cursive",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                >
+                  JustPause Salon & Spa
+                </motion.h1>
               </div>
               <motion.p
                 className="text-2xl md:text-3xl text-slate-600 font-light tracking-wide"
@@ -126,7 +138,7 @@ export default function Landing({ onEnter }: LandingProps) {
                 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
               >
                 SALON & SPA MANAGEMENT SYSTEM
               </motion.p>

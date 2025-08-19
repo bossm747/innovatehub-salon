@@ -72,27 +72,27 @@ export default function Preloader({ onComplete }: PreloaderProps) {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <div className="relative flex flex-col items-center">
+            <div className="relative flex items-center justify-center gap-4">
               <motion.img
                 src="/justpause-logo.png"
                 alt="JustPause Salon & Spa"
-                className="h-40 md:h-48 w-auto mb-4"
+                className="h-28 md:h-36 w-auto"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
-              <motion.p
-                className="text-xl md:text-2xl text-slate-600 mt-2 font-light tracking-wide"
-                style={{ 
-                  fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
-                  letterSpacing: "0.08em"
+              <motion.h1
+                className="text-3xl md:text-4xl text-slate-800 font-normal leading-tight"
+                style={{
+                  fontFamily: "'Great Vibes', 'Dancing Script', cursive",
+                  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
               >
-                SALON & SPA
-              </motion.p>
+                JustPause<br/>Salon & Spa
+              </motion.h1>
               
               {/* Sparkle Effects */}
               <motion.div
