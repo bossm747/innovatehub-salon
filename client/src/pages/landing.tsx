@@ -108,9 +108,9 @@ export default function Landing({ onEnter }: LandingProps) {
           >
             {/* Logo */}
             <div className="mb-8">
-              <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center mb-6">
                 <motion.img
-                  src="@assets/Justpause_1755592468640.png"
+                  src="/attached_assets/Justpause_1755592468640.png"
                   alt="JustPause Salon & Spa"
                   className="h-32 md:h-40 w-auto"
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -119,22 +119,28 @@ export default function Landing({ onEnter }: LandingProps) {
                 />
               </div>
               <motion.h1
-                className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 mb-4"
-                style={{ fontFamily: "'Dancing Script', cursive" }}
+                className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-slate-800 via-slate-600 to-slate-500 mb-4 tracking-widest"
+                style={{ 
+                  fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+                  letterSpacing: "0.15em"
+                }}
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
               >
-                JustPause
+                JUSTPAUSE
               </motion.h1>
               <motion.p
-                className="text-3xl md:text-4xl text-slate-600"
-                style={{ fontFamily: "'Dancing Script', cursive" }}
+                className="text-2xl md:text-3xl text-slate-600 font-light tracking-wide"
+                style={{ 
+                  fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+                  letterSpacing: "0.08em"
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                Salon & Spa Management System
+                SALON & SPA MANAGEMENT SYSTEM
               </motion.p>
             </div>
 
@@ -388,8 +394,11 @@ export default function Landing({ onEnter }: LandingProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'Dancing Script', cursive" }}>
-                JustPause Salon & Spa
+              <h3 className="text-2xl font-light mb-4 tracking-widest" style={{ 
+                fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+                letterSpacing: "0.12em"
+              }}>
+                JUSTPAUSE SALON & SPA
               </h3>
               <p className="text-slate-300 leading-relaxed">
                 Complete management solution for Philippine beauty businesses. 

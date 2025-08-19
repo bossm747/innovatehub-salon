@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Heart } from "lucide-react";
-import logoImage from "@assets/Justpause_1755592468640.png";
 
 interface SalonLogoProps {
   className?: string;
@@ -74,7 +73,7 @@ export default function SalonLogo({
       {showImage && (
         <div className="mb-2">
           <img 
-            src={logoImage} 
+            src="/attached_assets/Justpause_1755592468640.png" 
             alt="JustPause Salon & Spa" 
             className={sizeClasses.image}
           />
@@ -84,13 +83,14 @@ export default function SalonLogo({
       {/* Main logo text */}
       <div className="relative">
         <h1 
-          className={`handwritten-logo text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-bold tracking-wide ${sizeClasses.text}`}
+          className={`handwritten-logo text-center bg-gradient-to-r from-slate-800 via-slate-600 to-slate-500 bg-clip-text text-transparent font-light tracking-widest ${sizeClasses.text}`}
           style={{
-            fontFamily: "'Dancing Script', cursive",
-            textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+            letterSpacing: "0.15em",
+            textShadow: "0 1px 2px rgba(0,0,0,0.05)",
           }}
         >
-          {businessName}
+          {businessName.toUpperCase()}
         </h1>
         
         {/* Subtle underline decoration */}

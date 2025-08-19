@@ -74,7 +74,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           >
             <div className="relative flex flex-col items-center">
               <motion.img
-                src="@assets/Justpause_1755592468640.png"
+                src="/attached_assets/Justpause_1755592468640.png"
                 alt="JustPause Salon & Spa"
                 className="h-24 md:h-32 w-auto mb-4"
                 initial={{ scale: 0.5, opacity: 0 }}
@@ -82,8 +82,11 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
               <motion.h1
-                className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-500 to-purple-600"
-                style={{ fontFamily: "'Dancing Script', cursive" }}
+                className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-slate-700 via-slate-500 to-slate-600 tracking-widest"
+                style={{ 
+                  fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+                  letterSpacing: "0.15em"
+                }}
                 animate={{
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                 }}
@@ -93,7 +96,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                   ease: "linear"
                 }}
               >
-                JustPause
+                JUSTPAUSE
               </motion.h1>
               <motion.p
                 className="text-2xl md:text-3xl text-slate-600 mt-2"
