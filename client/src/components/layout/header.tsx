@@ -33,7 +33,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
           
           {/* Mobile Logo */}
           <div className="lg:hidden flex-1 flex justify-center">
-            <SalonLogo className="float-animation" />
+            <SalonLogo className="float-animation" size="sm" />
           </div>
           
           <div className="flex items-center space-x-4">

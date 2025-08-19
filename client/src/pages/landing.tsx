@@ -74,8 +74,8 @@ export default function Landing({ onEnter }: LandingProps) {
   });
 
   const realStats = [
-    { number: `${dashboardStats?.totalClients || 0}+`, label: "Happy Clients" },
-    { number: `${appointmentsData?.length || 0}+`, label: "Appointments Managed" },
+    { number: `${(dashboardStats as any)?.totalClients || 0}+`, label: "Happy Clients" },
+    { number: `${Array.isArray(appointmentsData) ? appointmentsData.length : 0}+`, label: "Appointments Managed" },
     { number: "99.9%", label: "Uptime" },
     { number: "24/7", label: "Support" }
   ];
@@ -105,20 +105,22 @@ export default function Landing({ onEnter }: LandingProps) {
     <div className="min-h-screen text-slate-800">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Salon Background Image */}
+        {/* Hero Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/salon-bg-1.jpg)' }}
+          style={{ backgroundImage: 'url(/hero-background.jpeg)' }}
         ></div>
-        <div className="absolute inset-0 bg-white/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 via-transparent to-slate-900/40"></div>
         
-        {/* Animated Background */}
+        {/* Enhanced Stunning Animated Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-pink-300 to-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-orange-300 to-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-yellow-300 to-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-80 animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 rounded-full mix-blend-multiply filter blur-xl opacity-75 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-65 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-gradient-to-r from-teal-400 via-emerald-500 to-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/3 right-1/5 w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '5s' }}></div>
+          <div className="absolute bottom-1/3 left-1/5 w-44 h-44 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-pulse" style={{ animationDelay: '6s' }}></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 text-center">

@@ -38,8 +38,8 @@ export default function SalonLogo({
     switch (size) {
       case "sm":
         return {
-          image: "h-10 w-auto",
-          text: "text-lg md:text-xl",
+          image: "h-8 w-auto",
+          text: "text-sm md:text-base",
           subtext: "text-xs"
         };
       case "lg":
