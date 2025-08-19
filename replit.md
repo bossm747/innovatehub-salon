@@ -14,7 +14,9 @@ This is a comprehensive salon and spa management platform for JustPause Salon & 
 - Enhanced hero section with uploaded background image (/hero-background.jpeg)
 - Implemented stunning animated background with multi-color gradients and enhanced blur effects
 - Fixed mobile header text sizing issue by reducing logo font size for better mobile compatibility
-- Added floating JustPause logo below header - 100% larger size, no container spacing
+- Added mobile sticky floating logo overlay on header with z-50 positioning
+- Desktop maintains large floating logo below header
+- Removed mobile header logo/text to make space for overlay
 - Updated testimonials for Dubai/UAE market with authentic local business references
 - Complete rebranding from "Serenity Spa" to "JustPause Salon & Spa"
 - Updated logo throughout the application with larger, more prominent display

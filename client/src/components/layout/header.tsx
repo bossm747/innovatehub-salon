@@ -32,10 +32,8 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
               <p className="text-sm text-slate-500">Manage your JustPause operations</p>
             </div>
             
-            {/* Mobile Logo */}
-            <div className="lg:hidden flex-1 flex justify-center">
-              <SalonLogo className="float-animation" size="sm" />
-            </div>
+            {/* Mobile - Empty space for floating logo */}
+            <div className="lg:hidden flex-1"></div>
             
             <div className="flex items-center space-x-4">
               <div className="hidden sm:block">
@@ -75,8 +73,17 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         </div>
       </div>
       
-      {/* Floating Logo */}
-      <div className="flex justify-center">
+      {/* Mobile Sticky Floating Logo Overlay */}
+      <div className="lg:hidden fixed top-2 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+        <img 
+          src="/justpause-logo.png" 
+          alt="JustPause Salon & Spa" 
+          className="h-12 w-auto drop-shadow-lg"
+        />
+      </div>
+      
+      {/* Desktop Floating Logo */}
+      <div className="hidden lg:flex justify-center">
         <img 
           src="/justpause-logo.png" 
           alt="JustPause Salon & Spa" 
