@@ -76,7 +76,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
       {/* Mobile Sticky Floating Logo Overlay - Positioned at header level */}
       <div className="lg:hidden fixed top-0 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
         <img 
-          src="/justpause-logo.png" 
+          src="/justpause-logo-compact.png" 
           alt="JustPause Salon & Spa" 
           className="h-16 w-auto drop-shadow-lg mt-0"
         />
