@@ -67,8 +67,8 @@ export default function StockAdjustmentModal({
 
   const createTransactionMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertInventoryTransactionSchema>) => {
-      const response = await apiRequest("POST", "/api/inventory-transactions", data);
-      return response.json();
+      const response = await apiRequest("/api/inventory-transactions", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });

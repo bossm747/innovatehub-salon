@@ -84,6 +84,34 @@ export default function ServiceModal({ open, onOpenChange }: ServiceModalProps) 
   });
 
   const onSubmit = (data: z.infer<typeof insertServiceSchema>) => {
+    // Validate required fields
+    if (!data.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter service name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data.category) {
+      toast({
+        title: "Error",
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data.price || parseFloat(data.price) <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid price",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createServiceMutation.mutate(data);
   };
 

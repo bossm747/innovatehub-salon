@@ -129,10 +129,31 @@ export default function StaffModal({ open, onOpenChange }: StaffModalProps) {
   });
 
   const onSubmit = (data: z.infer<typeof insertStaffSchema>) => {
-    // Ensure specialties is an array
+    // Validate required fields
+    if (!data.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter staff member's name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data.email.trim()) {
+      toast({
+        title: "Error", 
+        description: "Please enter staff member's email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Ensure specialties is an array and format data
     const formattedData = {
       ...data,
-      specialties: Array.isArray(data.specialties) ? data.specialties : []
+      specialties: Array.isArray(data.specialties) ? data.specialties : [],
+      phone: data.phone || "",
+      role: data.role || "",
     };
     createStaffMutation.mutate(formattedData);
   };

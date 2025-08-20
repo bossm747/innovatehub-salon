@@ -47,8 +47,8 @@ export default function SupplierModal({ open, onOpenChange }: SupplierModalProps
 
   const createSupplierMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertSupplierSchema>) => {
-      const response = await apiRequest("POST", "/api/suppliers", data);
-      return response.json();
+      const response = await apiRequest("/api/suppliers", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });

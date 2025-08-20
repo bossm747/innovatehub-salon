@@ -78,6 +78,30 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
   });
 
   const onSubmit = (data: z.infer<typeof insertClientSchema>) => {
+    // Validate required fields
+    if (!data.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter client's name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate date of birth if provided
+    if (data.dateOfBirth && data.dateOfBirth !== "") {
+      const birthDate = new Date(data.dateOfBirth);
+      const today = new Date();
+      if (birthDate > today) {
+        toast({
+          title: "Error",
+          description: "Date of birth cannot be in the future",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     createClientMutation.mutate(data);
   };
 
