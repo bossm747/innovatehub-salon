@@ -78,11 +78,11 @@ export default function Dashboard() {
 
         {/* Stats Grid */}
         <div className="grid-responsive-stats">
-          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200">
             <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                  <CalendarCheck className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg group-hover:from-blue-600 group-hover:to-indigo-700 transition-all duration-300 shadow-lg">
+                  <CalendarCheck className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
                 </div>
                 <div className="ml-4 lg:ml-6">
                   <p className="text-responsive-sm font-medium text-slate-600">Today's Appointments</p>
@@ -94,11 +94,11 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200">
             <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
-                  <Banknote className="h-6 w-6 lg:h-8 lg:w-8 text-secondary" />
+                <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg group-hover:from-emerald-600 group-hover:to-green-700 transition-all duration-300 shadow-lg">
+                  <Banknote className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
                 </div>
                 <div className="ml-4 lg:ml-6">
                   <p className="text-responsive-sm font-medium text-slate-600">Daily Revenue</p>
@@ -110,11 +110,11 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group bg-gradient-to-br from-purple-50 to-violet-100 border-purple-200">
             <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
-                  <Users className="h-6 w-6 lg:h-8 lg:w-8 text-accent" />
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg group-hover:from-purple-600 group-hover:to-violet-700 transition-all duration-300 shadow-lg">
+                  <Users className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
                 </div>
                 <div className="ml-4 lg:ml-6">
                   <p className="text-responsive-sm font-medium text-slate-600">Total Clients</p>
@@ -126,11 +126,11 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group">
+          <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 group bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200">
             <CardContent className="card-responsive">
               <div className="flex items-center">
-                <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
-                  <Star className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600" />
+                <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg group-hover:from-orange-600 group-hover:to-amber-700 transition-all duration-300 shadow-lg">
+                  <Star className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
                 </div>
                 <div className="ml-4 lg:ml-6">
                   <p className="text-responsive-sm font-medium text-slate-600">Rating</p>
@@ -145,7 +145,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-12">
           {/* Quick Actions */}
           <div className="lg:col-span-1">
-            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300">
+            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-rose-50 to-pink-100 border-rose-200">
               <CardHeader className="pb-4">
                 <CardTitle className="text-responsive-lg">Quick Actions</CardTitle>
               </CardHeader>
@@ -190,7 +190,7 @@ export default function Dashboard() {
 
           {/* Today's Schedule */}
           <div className="lg:col-span-2">
-            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300">
+            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-cyan-50 to-blue-100 border-cyan-200">
               <CardHeader className="pb-4">
                 <CardTitle className="text-responsive-lg">Today's Schedule</CardTitle>
               </CardHeader>

@@ -44,22 +44,22 @@ export default function Reports() {
 
       {/* Report Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <Card>
+        <Card className="bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Monthly Revenue</p>
-                <p className="text-2xl font-semibold text-slate-900">$45,280</p>
+                <p className="text-2xl font-semibold text-slate-900">₱45,280</p>
                 <p className="text-sm text-secondary">+12% from last month</p>
               </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-primary" />
+              <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg shadow-lg">
+                <TrendingUp className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -67,14 +67,14 @@ export default function Reports() {
                 <p className="text-2xl font-semibold text-slate-900">{stats?.totalAppointments || 0}</p>
                 <p className="text-sm text-secondary">+8% from last month</p>
               </div>
-              <div className="p-3 bg-secondary/10 rounded-lg">
-                <CalendarCheck className="h-6 w-6 text-secondary" />
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                <CalendarCheck className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-purple-50 to-violet-100 border-purple-200 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -82,14 +82,14 @@ export default function Reports() {
                 <p className="text-2xl font-semibold text-slate-900">87%</p>
                 <p className="text-sm text-secondary">+3% from last month</p>
               </div>
-              <div className="p-3 bg-accent/10 rounded-lg">
-                <Heart className="h-6 w-6 text-accent" />
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg shadow-lg">
+                <Heart className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -97,8 +97,8 @@ export default function Reports() {
                 <p className="text-2xl font-semibold text-slate-900">4.8</p>
                 <p className="text-sm text-secondary">Based on 156 reviews</p>
               </div>
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <Star className="h-6 w-6 text-yellow-600" />
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg shadow-lg">
+                <Star className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
@@ -108,7 +108,7 @@ export default function Reports() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Revenue Chart */}
-        <Card>
+        <Card className="bg-gradient-to-br from-cyan-50 to-blue-100 border-cyan-200 hover:shadow-lg transition-all duration-300">
           <CardHeader>
             <CardTitle>Revenue Trend</CardTitle>
           </CardHeader>
@@ -124,7 +124,7 @@ export default function Reports() {
         </Card>
 
         {/* Service Popularity */}
-        <Card>
+        <Card className="bg-gradient-to-br from-rose-50 to-pink-100 border-rose-200 hover:shadow-lg transition-all duration-300">
           <CardHeader>
             <CardTitle>Popular Services</CardTitle>
           </CardHeader>

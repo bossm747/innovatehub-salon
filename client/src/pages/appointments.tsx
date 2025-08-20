@@ -98,7 +98,7 @@ export default function Appointments() {
         </div>
 
         {/* Calendar View */}
-        <Card className="mb-8 spa-card-shadow hover:shadow-lg transition-all duration-300">
+        <Card className="mb-8 spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-sky-50 to-blue-100 border-sky-200">
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <CardTitle className="text-responsive-lg">December 2024</CardTitle>

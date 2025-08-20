@@ -60,7 +60,7 @@ export default function Staff() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {staff.map((member: any) => (
-              <Card key={member.id}>
+              <Card key={member.id} className="bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
                     <Avatar className="mx-auto h-20 w-20 mb-3">

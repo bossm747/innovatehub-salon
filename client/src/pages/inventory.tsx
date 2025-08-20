@@ -128,11 +128,11 @@ export default function Inventory() {
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Package className="h-6 w-6 text-primary" />
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                  <Package className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-slate-600">Total Products</p>
@@ -142,11 +142,11 @@ export default function Inventory() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-3 bg-secondary/10 rounded-lg">
-                  <BarChart3 className="h-6 w-6 text-secondary" />
+                <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg shadow-lg">
+                  <BarChart3 className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-slate-600">Inventory Value</p>
@@ -156,11 +156,11 @@ export default function Inventory() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                <div className="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg">
+                  <AlertTriangle className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-slate-600">Low Stock Items</p>
@@ -170,11 +170,11 @@ export default function Inventory() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-100 border-yellow-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <Truck className="h-6 w-6 text-green-600" />
+                <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg shadow-lg">
+                  <Truck className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-slate-600">Active Suppliers</p>

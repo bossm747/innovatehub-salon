@@ -32,7 +32,7 @@ export default function Clients() {
     );
   }
 
-  const filteredClients = clients?.filter((client: any) => {
+  const filteredClients = (clients as any[])?.filter((client: any) => {
     const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          client.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || client.status === statusFilter;
@@ -101,7 +101,7 @@ export default function Clients() {
               <Users className="mx-auto h-12 w-12 text-slate-300 mb-4" />
               <h3 className="text-lg font-medium text-slate-900 mb-2">No clients found</h3>
               <p className="text-slate-500 mb-6">
-                {clients?.length === 0 
+                {(clients as any[])?.length === 0 
                   ? "Get started by adding your first client"
                   : "Try adjusting your search or filter criteria"
                 }
@@ -115,7 +115,7 @@ export default function Clients() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredClients.map((client: any) => (
-              <Card key={client.id}>
+              <Card key={client.id} className="bg-gradient-to-br from-slate-50 to-gray-100 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -151,7 +151,7 @@ export default function Clients() {
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Total Spent:</span>
-                      <span className="text-slate-900">${client.totalSpent}</span>
+                      <span className="text-slate-900">₱{client.totalSpent}</span>
                     </div>
                   </div>
                   

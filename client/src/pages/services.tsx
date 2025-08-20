@@ -122,7 +122,7 @@ export default function Services() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredServices.map((service: any) => (
-              <Card key={service.id} className="overflow-hidden">
+              <Card key={service.id} className="overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-100 border-indigo-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                   <Scissors className="h-16 w-16 text-primary/40" />
                 </div>
