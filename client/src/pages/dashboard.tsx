@@ -145,42 +145,39 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-12">
           {/* Quick Actions */}
           <div className="lg:col-span-1">
-            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-rose-50 to-pink-100 border-rose-200">
+            <Card className="spa-card-shadow hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-100 border-rose-200 shadow-rose-100/50">
               <CardHeader className="pb-4">
-                <CardTitle className="text-responsive-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-responsive-lg bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent font-bold">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 lg:space-y-4">
                   <Button 
-                    className="w-full justify-between bg-primary/10 hover:bg-primary/20 text-primary py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
-                    variant="ghost"
+                    className="w-full justify-between bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl border-0"
                     onClick={() => setAppointmentModalOpen(true)}
                   >
                     <div className="flex items-center">
-                      <Plus className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
-                      <span className="text-responsive-base font-medium">New Appointment</span>
+                      <Plus className="mr-3 h-5 w-5 lg:h-6 lg:w-6 text-white" />
+                      <span className="text-responsive-base font-medium text-white">New Appointment</span>
                     </div>
                   </Button>
                   
                   <Button 
-                    className="w-full justify-between bg-secondary/10 hover:bg-secondary/20 text-secondary py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
-                    variant="ghost"
+                    className="w-full justify-between bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl border-0"
                     onClick={() => setClientModalOpen(true)}
                   >
                     <div className="flex items-center">
-                      <UserPlus className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
-                      <span className="text-responsive-base font-medium">Add Client</span>
+                      <UserPlus className="mr-3 h-5 w-5 lg:h-6 lg:w-6 text-white" />
+                      <span className="text-responsive-base font-medium text-white">Add Client</span>
                     </div>
                   </Button>
                   
                   <Button 
-                    className="w-full justify-between bg-accent/10 hover:bg-accent/20 text-accent py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
-                    variant="ghost"
+                    className="w-full justify-between bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl border-0"
                     onClick={() => window.location.href = '/appointments'}
                   >
                     <div className="flex items-center">
-                      <Calendar className="mr-3 h-5 w-5 lg:h-6 lg:w-6" />
-                      <span className="text-responsive-base font-medium">View Calendar</span>
+                      <Calendar className="mr-3 h-5 w-5 lg:h-6 lg:w-6 text-white" />
+                      <span className="text-responsive-base font-medium text-white">View Calendar</span>
                     </div>
                   </Button>
                 </div>
@@ -190,17 +187,20 @@ export default function Dashboard() {
 
           {/* Today's Schedule */}
           <div className="lg:col-span-2">
-            <Card className="spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-cyan-50 to-blue-100 border-cyan-200">
+            <Card className="spa-card-shadow hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-100 border-cyan-200 shadow-cyan-100/50">
               <CardHeader className="pb-4">
-                <CardTitle className="text-responsive-lg">Today's Schedule</CardTitle>
+                <CardTitle className="text-responsive-lg bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent font-bold">Today's Schedule</CardTitle>
               </CardHeader>
               <CardContent>
                 {!todayAppointments || !Array.isArray(todayAppointments) || (todayAppointments as any[])?.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500">
-                    <Calendar className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-                    <p>No appointments scheduled for today</p>
+                  <div className="text-center py-8 px-6 bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl border border-slate-200">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                      <Calendar className="h-8 w-8 text-white" />
+                    </div>
+                    <p className="text-slate-600 font-medium mb-2">No appointments scheduled for today</p>
+                    <p className="text-sm text-slate-500 mb-4">Start by scheduling your first appointment</p>
                     <Button 
-                      className="mt-4"
+                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       onClick={() => setAppointmentModalOpen(true)}
                     >
                       Schedule Appointment
@@ -209,29 +209,29 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-4">
                     {Array.isArray(todayAppointments) && (todayAppointments as any[])?.map((appointment: any) => (
-                      <div key={appointment.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <div key={appointment.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-white to-slate-50 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                         <div className="flex items-center space-x-4">
-                          <div className="text-center">
-                            <div className="text-sm font-semibold text-slate-900">{appointment.time}</div>
-                            <div className="text-xs text-slate-500">{appointment.duration} min</div>
+                          <div className="text-center bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-3 rounded-lg shadow-lg">
+                            <div className="text-sm font-semibold">{appointment.time}</div>
+                            <div className="text-xs opacity-90">{appointment.duration} min</div>
                           </div>
-                          <div>
-                            <div className="text-sm font-medium text-slate-900">{appointment.clientName}</div>
-                            <div className="text-xs text-slate-500">{appointment.serviceName}</div>
+                          <div className="flex-1">
+                            <div className="text-sm font-semibold text-slate-900 mb-1">{appointment.clientName}</div>
+                            <div className="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded-full inline-block">{appointment.serviceName}</div>
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge variant={
-                            appointment.status === 'confirmed' ? 'default' : 
-                            appointment.status === 'pending' ? 'secondary' : 
-                            appointment.status === 'cancelled' ? 'outline' : 'destructive'
-                          }>
+                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            appointment.status === 'confirmed' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' : 
+                            appointment.status === 'pending' ? 'bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-lg' : 
+                            appointment.status === 'cancelled' ? 'bg-gradient-to-r from-gray-500 to-slate-600 text-white shadow-lg' : 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg'
+                          }`}>
                             {appointment.status}
-                          </Badge>
+                          </div>
                           {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-700">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full p-2 transition-all duration-300">
                                   <X className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
