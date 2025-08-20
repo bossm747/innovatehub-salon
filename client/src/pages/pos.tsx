@@ -130,7 +130,7 @@ export default function POS() {
   const generateServiceCategories = () => {
     if (!services) return [{ value: "all", label: "All Services" }];
     
-    const uniqueCategories = [...new Set((services as any[]).map((service: any) => service.category))];
+    const uniqueCategories = Array.from(new Set((services as any[]).map((service: any) => service.category)));
     const categories = [{ value: "all", label: "All Services" }];
     
     uniqueCategories.forEach(category => {
@@ -286,7 +286,7 @@ export default function POS() {
     }
 
     const transactionData = {
-      clientId: selectedCustomer?.id,
+      clientId: selectedCustomer?.id === null ? undefined : selectedCustomer?.id, // Handle anonymous customer
       staffId: selectedStaff?.id || (staff as any[])[0]?.id, // Use selected staff or default to first
       items: cart,
       subtotal: subtotal.toFixed(2),
@@ -369,14 +369,27 @@ export default function POS() {
               </div>
               <div className="flex gap-2">
                 <Select value={selectedCustomer?.id || ""} onValueChange={(value) => {
-                  const customer = (clients.data as any[])?.find(c => c.id === value);
-                  setSelectedCustomer(customer);
+                  if (value === "anonymous") {
+                    setSelectedCustomer({ id: null, name: "Anonymous Customer", email: "" });
+                  } else {
+                    const customer = (clients as any[])?.find(c => c.id === value);
+                    setSelectedCustomer(customer);
+                  }
                 }}>
                   <SelectTrigger className="flex-1 border-emerald-300 focus:border-emerald-500">
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(clients.data as any[])?.map((customer: any) => (
+                    {/* Anonymous Customer Option */}
+                    <SelectItem value="anonymous">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                        <span className="font-medium text-gray-600">Anonymous Customer</span>
+                        <span className="text-xs text-slate-500">(No registration required)</span>
+                      </div>
+                    </SelectItem>
+                    {/* Registered Customers */}
+                    {(clients as any[])?.map((customer: any) => (
                       <SelectItem key={customer.id} value={customer.id}>
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-emerald-500 rounded-full" />
