@@ -7,6 +7,7 @@ import { z } from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -101,10 +102,16 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
     const selectedService = (services as any[]).find((s: any) => s.id === data.serviceId);
     if (selectedService) {
       data.duration = selectedService.duration;
-      data.totalAmount = selectedService.price;
+      data.totalAmount = selectedService.price.toString();
     }
     
-    createAppointmentMutation.mutate(data);
+    // Convert date and time to proper format
+    const submissionData = {
+      ...data,
+      totalAmount: data.totalAmount || "0",
+    };
+    
+    createAppointmentMutation.mutate(submissionData);
   };
 
   return (
@@ -112,6 +119,9 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto spa-modal-shadow">
         <DialogHeader>
           <DialogTitle className="text-responsive-lg">New Appointment</DialogTitle>
+          <DialogDescription>
+            Create a new appointment for your client
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
