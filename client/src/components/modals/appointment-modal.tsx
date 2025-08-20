@@ -37,9 +37,17 @@ const appointmentFormSchema = insertAppointmentSchema.extend({
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
 }).refine((data) => {
+  const appointmentDateTime = new Date(`${data.date}T${data.time}`);
+  const now = new Date();
+  return appointmentDateTime > now;
+}, {
+  message: "Appointment must be scheduled for a future date and time",
+  path: ["date"]
+}).refine((data) => {
   return data.clientId && data.serviceId;
 }, {
   message: "Client and service are required",
+  path: ["clientId"]
 });
 
 interface AppointmentModalProps {
@@ -70,10 +78,8 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
       staffId: "",
       date: "",
       time: "",
-      duration: 60,
       status: "confirmed",
       notes: "",
-      totalAmount: "0",
     },
   });
 
@@ -104,20 +110,26 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
   const onSubmit = (data: z.infer<typeof appointmentFormSchema>) => {
     // Find selected service to get price and duration
     const selectedService = (services as any[]).find((s: any) => s.id === data.serviceId);
-    if (selectedService) {
-      data.duration = selectedService.duration;
-      data.totalAmount = selectedService.price.toString();
+    if (!selectedService) {
+      toast({
+        title: "Error",
+        description: "Please select a valid service",
+        variant: "destructive",
+      });
+      return;
     }
     
-    // Assign to first available staff member if none selected
-    if (!data.staffId && (staff as any[]).length > 0) {
-      data.staffId = (staff as any[])[0].id;
-    }
-    
-    // Convert date and time to proper format
+    // Prepare submission data with proper types
     const submissionData = {
-      ...data,
-      totalAmount: data.totalAmount || "0",
+      clientId: data.clientId,
+      serviceId: data.serviceId,
+      staffId: data.staffId || (staff as any[])[0]?.id || "",
+      date: data.date,
+      time: data.time,
+      duration: selectedService.duration,
+      status: data.status || "confirmed",
+      notes: data.notes || "",
+      totalAmount: selectedService.price.toString(),
     };
     
     createAppointmentMutation.mutate(submissionData);
