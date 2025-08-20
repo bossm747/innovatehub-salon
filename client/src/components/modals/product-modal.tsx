@@ -56,7 +56,7 @@ interface ProductModalProps {
 export default function ProductModal({ open, onOpenChange }: ProductModalProps) {
   const { toast } = useToast();
 
-  const { data: suppliers } = useQuery({
+  const { data: suppliers = [] } = useQuery<any[]>({
     queryKey: ["/api/suppliers"],
   });
 
@@ -139,7 +139,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                   <FormItem>
                     <FormLabel>Brand</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter brand name" {...field} />
+                      <Input placeholder="Enter brand name" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,7 +157,8 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                     <Textarea 
                       placeholder="Enter product description" 
                       rows={3}
-                      {...field} 
+                      {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -172,7 +173,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
@@ -197,7 +198,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Supplier</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select supplier" />
@@ -225,7 +226,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                   <FormItem>
                     <FormLabel>SKU</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter SKU" {...field} />
+                      <Input placeholder="Enter SKU" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -239,7 +240,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                   <FormItem>
                     <FormLabel>Barcode</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter barcode" {...field} />
+                      <Input placeholder="Enter barcode" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -281,6 +282,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                         step="0.01"
                         placeholder="0.00"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -300,7 +302,8 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                       <Input 
                         type="number" 
                         min="0"
-                        {...field} 
+                        {...field}
+                        value={field.value || 0}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       />
                     </FormControl>
@@ -319,7 +322,8 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                       <Input 
                         type="number" 
                         min="0"
-                        {...field} 
+                        {...field}
+                        value={field.value || 0}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       />
                     </FormControl>
@@ -334,7 +338,7 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />

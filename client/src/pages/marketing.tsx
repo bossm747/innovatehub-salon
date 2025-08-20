@@ -78,15 +78,15 @@ export default function Marketing() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const { data: campaigns = [] } = useQuery({
+  const { data: campaigns = [] } = useQuery<any[]>({
     queryKey: ["/api/marketing/campaigns"],
   });
 
-  const { data: clients = [] } = useQuery({
+  const { data: clients = [] } = useQuery<any[]>({
     queryKey: ["/api/clients"],
   });
 
-  const { data: uploadedLeads = [] } = useQuery({
+  const { data: uploadedLeads = [] } = useQuery<any[]>({
     queryKey: ["/api/marketing/leads"],
   });
 

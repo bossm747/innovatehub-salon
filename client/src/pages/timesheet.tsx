@@ -273,7 +273,7 @@ export default function Timesheet() {
                             <SelectContent>
                               {staff.map((member: any) => (
                                 <SelectItem key={member.id} value={member.id}>
-                                  {member.name} - {member.position}
+                                  {member.name} - {member.role}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -298,7 +298,7 @@ export default function Timesheet() {
                     <Button 
                       type="submit" 
                       className="w-full bg-green-600 hover:bg-green-700"
-                      disabled={clockInMutation.isPending || !selectedStaff || getActiveRecord(selectedStaff)}
+                      disabled={clockInMutation.isPending || !selectedStaff || !!getActiveRecord(selectedStaff)}
                     >
                       {clockInMutation.isPending ? "Clocking In..." : "Clock In"}
                     </Button>
@@ -364,7 +364,7 @@ export default function Timesheet() {
                         variant="outline" 
                         size="sm" 
                         className="w-full"
-                        onClick={() => endBreakMutation.mutate({ id: getActiveRecord(selectedStaff)?.id, notes: "" })}
+                        onClick={() => endBreakMutation.mutate({ id: getActiveRecord(selectedStaff)?.id || "", notes: "" })}
                         disabled={endBreakMutation.isPending}
                       >
                         <Play className="h-4 w-4 mr-2" />
@@ -595,7 +595,7 @@ export default function Timesheet() {
                           {staffMember?.name || 'Unknown Staff'}
                         </TableCell>
                         <TableCell>
-                          {staffMember?.position || '-'}
+                          {staffMember?.role || '-'}
                         </TableCell>
                         <TableCell>
                           {staffReport.daysWorked || 0}

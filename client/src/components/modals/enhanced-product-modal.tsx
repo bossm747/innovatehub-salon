@@ -71,7 +71,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<any>(null);
 
-  const { data: suppliers } = useQuery({
+  const { data: suppliers = [] } = useQuery<any[]>({
     queryKey: ["/api/suppliers"],
   });
 
@@ -584,6 +584,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                         step="0.01"
                         placeholder="0.00"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -607,6 +608,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                         step="0.01"
                         placeholder="0.00"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -628,7 +630,8 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                         <Input 
                           type="number" 
                           min="0"
-                          {...field} 
+                          {...field}
+                          value={field.value || 0}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                         />
                       </FormControl>
@@ -647,7 +650,8 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                         <Input 
                           type="number" 
                           min="0"
-                          {...field} 
+                          {...field}
+                          value={field.value || 0}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                         />
                       </FormControl>
@@ -662,7 +666,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unit</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Unit" />
@@ -688,7 +692,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Supplier</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select supplier" />
