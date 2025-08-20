@@ -15,6 +15,7 @@ import {
   insertNotificationSettingsSchema
 } from "@shared/schema";
 import { sendAppointmentNotification } from "./notification-service";
+import { paymentGateway } from "./payment-gateway";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";

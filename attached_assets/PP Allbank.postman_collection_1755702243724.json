@@ -1,0 +1,611 @@
+{
+	"info": {
+		"_postman_id": "7900df5d-c91a-4e46-bc8b-92af0137ba6e",
+		"name": "PP Allbank",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7164652"
+	},
+	"item": [
+		{
+			"name": "QRPH",
+			"item": [
+				{
+					"name": "allbank/qrph/generate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 100.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/allbank/qrph/generate",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"allbank",
+								"qrph",
+								"generate"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/users/agents",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/agents?pageNumber=1&pageSize=10",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"agents"
+									],
+									"query": [
+										{
+											"key": "pageNumber",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 19:05:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"total_records\": 1,\n    \"page_number\": 1,\n    \"page_size\": 10,\n    \"data\": [\n        {\n            \"id\": 2,\n            \"username\": \"agent\",\n            \"email\": \"agent@platapay.ph\",\n            \"first_name\": \"Venus\",\n            \"last_name\": \"Olaivar\",\n            \"mobile_number\": \"09200000001\",\n            \"created_date\": \"2025-02-05T18:58:29.2333433\",\n            \"last_login_ip\": \"Unknown\",\n            \"store_name\": \"Platapay Business Center\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "allbank/qrph/transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/allbank/qrph/transactions?pageNumber=1&pageSize=10&searchQuery=&userId=23",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"allbank",
+								"qrph",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "searchQuery",
+									"value": ""
+								},
+								{
+									"key": "userId",
+									"value": "23"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/users/agents",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/agents?pageNumber=1&pageSize=10",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"agents"
+									],
+									"query": [
+										{
+											"key": "pageNumber",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 19:05:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"total_records\": 1,\n    \"page_number\": 1,\n    \"page_size\": 10,\n    \"data\": [\n        {\n            \"id\": 2,\n            \"username\": \"agent\",\n            \"email\": \"agent@platapay.ph\",\n            \"first_name\": \"Venus\",\n            \"last_name\": \"Olaivar\",\n            \"mobile_number\": \"09200000001\",\n            \"created_date\": \"2025-02-05T18:58:29.2333433\",\n            \"last_login_ip\": \"Unknown\",\n            \"store_name\": \"Platapay Business Center\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "/ecpay/billers/{billerName}",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/ecpay/billers/:{{billerName}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"ecpay",
+										"billers",
+										":{{billerName}}"
+									],
+									"variable": [
+										{
+											"key": "{{billerName}}",
+											"value": "GLOBELINES"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 13 Feb 2025 17:19:09 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"biller_tag\": \"GLOBELINES\",\n    \"description\": \"INNOVE COMMUNICATIONS INC.\",\n    \"category\": \"Telecommunications\",\n    \"field_details\": [\n        {\n            \"tag\": \"First Field\",\n            \"caption\": \"9 Digit Account Number\",\n            \"format\": \"Numeric\",\n            \"width\": 9\n        },\n        {\n            \"tag\": \"Second Field\",\n            \"caption\": \"Account Name\",\n            \"format\": \"AlphaNumeric\",\n            \"width\": 30\n        }\n    ],\n    \"remarks\": \"Transaction is posted real-time (voiding not allowed).\",\n    \"status\": true,\n    \"service_charge\": 10\n}"
+						},
+						{
+							"name": "/ecpay/billers/{billerName} Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/ecpay/product-trx-ecbill/:{{referenceNumber}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"ecpay",
+										"product-trx-ecbill",
+										":{{referenceNumber}}"
+									],
+									"variable": [
+										{
+											"key": "{{referenceNumber}}",
+											"value": "EB202502140217167401"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 13 Feb 2025 19:03:26 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ppay_reference_number\": \"EB202502140217167401\",\n    \"trace_number\": null,\n    \"tag\": \"GLOBELINES\",\n    \"description\": \"INNOVE COMMUNICATIONS INC.\",\n    \"category\": \"Telecommunications\",\n    \"first_field_caption\": \"9 Digit Account Number\",\n    \"first_field_format\": \"Numeric\",\n    \"first_field_value\": \"927067851\",\n    \"second_field_caption\": \"Account Name\",\n    \"second_field_format\": \"Alphanumeric\",\n    \"second_field_value\": \"Bryan del Norte\",\n    \"service_charge\": 10,\n    \"bill_amount\": 675,\n    \"total_amount\": 685,\n    \"transaction_state\": {\n        \"id\": 3,\n        \"name\": \"REJECTED\"\n    },\n    \"requested_by_user\": \"agent\",\n    \"approved_by_user\": null,\n    \"created_date\": \"2025-02-14T02:17:16.8380162\",\n    \"updated_date\": \"2025-02-14T02:17:27.2702602\"\n}"
+						}
+					]
+				},
+				{
+					"name": "allbank/qrph/transactions/{referenceNumber}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/allbank/qrph/transactions/:{{referenceNumber}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"allbank",
+								"qrph",
+								"transactions",
+								":{{referenceNumber}}"
+							],
+							"variable": [
+								{
+									"key": "{{referenceNumber}}",
+									"value": "AQ202504162007192918"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/users/agents",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/agents?pageNumber=1&pageSize=10",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"agents"
+									],
+									"query": [
+										{
+											"key": "pageNumber",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 19:05:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"total_records\": 1,\n    \"page_number\": 1,\n    \"page_size\": 10,\n    \"data\": [\n        {\n            \"id\": 2,\n            \"username\": \"agent\",\n            \"email\": \"agent@platapay.ph\",\n            \"first_name\": \"Venus\",\n            \"last_name\": \"Olaivar\",\n            \"mobile_number\": \"09200000001\",\n            \"created_date\": \"2025-02-05T18:58:29.2333433\",\n            \"last_login_ip\": \"Unknown\",\n            \"store_name\": \"Platapay Business Center\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "/ecpay/billers/{billerName}",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/ecpay/billers/:{{billerName}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"ecpay",
+										"billers",
+										":{{billerName}}"
+									],
+									"variable": [
+										{
+											"key": "{{billerName}}",
+											"value": "GLOBELINES"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 13 Feb 2025 17:19:09 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"biller_tag\": \"GLOBELINES\",\n    \"description\": \"INNOVE COMMUNICATIONS INC.\",\n    \"category\": \"Telecommunications\",\n    \"field_details\": [\n        {\n            \"tag\": \"First Field\",\n            \"caption\": \"9 Digit Account Number\",\n            \"format\": \"Numeric\",\n            \"width\": 9\n        },\n        {\n            \"tag\": \"Second Field\",\n            \"caption\": \"Account Name\",\n            \"format\": \"AlphaNumeric\",\n            \"width\": 30\n        }\n    ],\n    \"remarks\": \"Transaction is posted real-time (voiding not allowed).\",\n    \"status\": true,\n    \"service_charge\": 10\n}"
+						},
+						{
+							"name": "/ecpay/billers/{billerName} Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/ecpay/product-trx-ecbill/:{{referenceNumber}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"ecpay",
+										"product-trx-ecbill",
+										":{{referenceNumber}}"
+									],
+									"variable": [
+										{
+											"key": "{{referenceNumber}}",
+											"value": "EB202502140217167401"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 13 Feb 2025 19:03:26 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ppay_reference_number\": \"EB202502140217167401\",\n    \"trace_number\": null,\n    \"tag\": \"GLOBELINES\",\n    \"description\": \"INNOVE COMMUNICATIONS INC.\",\n    \"category\": \"Telecommunications\",\n    \"first_field_caption\": \"9 Digit Account Number\",\n    \"first_field_format\": \"Numeric\",\n    \"first_field_value\": \"927067851\",\n    \"second_field_caption\": \"Account Name\",\n    \"second_field_format\": \"Alphanumeric\",\n    \"second_field_value\": \"Bryan del Norte\",\n    \"service_charge\": 10,\n    \"bill_amount\": 675,\n    \"total_amount\": 685,\n    \"transaction_state\": {\n        \"id\": 3,\n        \"name\": \"REJECTED\"\n    },\n    \"requested_by_user\": \"agent\",\n    \"approved_by_user\": null,\n    \"created_date\": \"2025-02-14T02:17:16.8380162\",\n    \"updated_date\": \"2025-02-14T02:17:27.2702602\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "/auth/login/service",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonResponse = pm.response.json();\r",
+							"pm.environment.set(\"token\", jsonResponse.token);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-platapay-key",
+						"value": "f6133c24-7cd6-4368-ad15-dbe1e1c66d48",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"username\",\r\n  \"password\": \"password\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/auth/login/service",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"auth",
+						"login",
+						"service"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "successful-response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"agent\",\r\n  \"password\": \"!Qazxsw2\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 05 Feb 2025 19:03:40 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Kestrel"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZ2VudCIsImp0aSI6ImFiZTk1ZmQ5LWFmY2UtNGI5My04N2U4LTQwMGFhNjM2ZDgwMCIsImlkIjoiMiIsInJvbGUiOiJBZ2VudCIsIm5iZiI6MTczODc4MjIyMSwiZXhwIjoxNzM4Nzg1ODIxLCJpYXQiOjE3Mzg3ODIyMjF9.hlMYK5GkuZhYcd5NYTdWpGqMM1KONKzELGehbLC8B9Y\",\n    \"user_id\": 2,\n    \"username\": \"agent\",\n    \"role\": \"Agent\"\n}"
+				}
+			]
+		}
+	]
+}
