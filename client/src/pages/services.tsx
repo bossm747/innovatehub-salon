@@ -38,9 +38,9 @@ export default function Services() {
   const generateCategories = () => {
     if (!services) return [{ id: "all", name: "All Services", count: 0 }];
     
-    const uniqueCategories = [...new Set((services as any[]).map((service: any) => service.category))];
+    const uniqueCategories = Array.from(new Set((services as any[]).map((service: any) => service.category)));
     const categories = [
-      { id: "all", name: "All Services", count: services.length }
+      { id: "all", name: "All Services", count: (services as any[]).length }
     ];
     
     uniqueCategories.forEach(category => {
@@ -57,7 +57,7 @@ export default function Services() {
 
   const categoriesWithCounts = generateCategories();
 
-  const filteredServices = services?.filter((service: any) => 
+  const filteredServices = (services as any[])?.filter((service: any) => 
     selectedCategory === "all" || service.category === selectedCategory
   ) || [];
 
@@ -108,7 +108,7 @@ export default function Services() {
               <Scissors className="mx-auto h-12 w-12 text-slate-300 mb-4" />
               <h3 className="text-lg font-medium text-slate-900 mb-2">No services found</h3>
               <p className="text-slate-500 mb-6">
-                {services?.length === 0 
+                {(services as any[])?.length === 0 
                   ? "Get started by adding your first service"
                   : "No services found in this category"
                 }

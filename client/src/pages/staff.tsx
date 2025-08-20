@@ -45,7 +45,7 @@ export default function Staff() {
         </div>
 
         {/* Staff Grid */}
-        {!staff || staff.length === 0 ? (
+        {!staff || (staff as any[]).length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <Bus className="mx-auto h-12 w-12 text-slate-300 mb-4" />
@@ -59,7 +59,7 @@ export default function Staff() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {staff.map((member: any) => (
+            {(staff as any[]).map((member: any) => (
               <Card key={member.id} className="bg-gradient-to-br from-teal-50 to-cyan-100 border-teal-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="text-center mb-4">

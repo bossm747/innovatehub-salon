@@ -66,7 +66,7 @@ export default function Inventory() {
   const generateProductCategories = () => {
     if (!products || products.length === 0) return [{ id: "all", name: "All Products", count: 0 }];
     
-    const uniqueCategories = [...new Set(products.map((product: any) => product.category))];
+    const uniqueCategories = Array.from(new Set(products.map((product: any) => product.category)));
     const categories = [
       { id: "all", name: "All Products", count: products.length }
     ];
