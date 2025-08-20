@@ -747,7 +747,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/transactions", async (req, res) => {
     try {
-      const transaction = await storage.createTransaction(req.body);
+      // Generate unique transaction number
+      const transactionNumber = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      
+      const transactionData = {
+        ...req.body,
+        transactionNumber
+      };
+      
+      const transaction = await storage.createTransaction(transactionData);
       res.status(201).json(transaction);
     } catch (error) {
       console.error('Create Transaction Error:', error);
