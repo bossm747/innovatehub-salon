@@ -397,3 +397,73 @@ export const insertEmailLeadSchema = createInsertSchema(emailLeads).omit({
 });
 
 export type InsertEmailLead = z.infer<typeof insertEmailLeadSchema>;
+
+// Business Profile Settings
+export const businessProfile = pgTable("business_profile", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  businessName: text("business_name").notNull().default("JustPause Salon & Spa"),
+  ownerName: text("owner_name"),
+  email: text("email"),
+  phone: text("phone"),
+  address: text("address"),
+  city: text("city"),
+  province: text("province"),
+  postalCode: text("postal_code"),
+  businessType: text("business_type").notNull().default("both"), // salon, spa, both
+  logo: text("logo"),
+  description: text("description"),
+  website: text("website"),
+  socialMedia: jsonb("social_media").$type<{
+    facebook: string;
+    instagram: string;
+    tiktok: string;
+  }>().default({
+    facebook: "",
+    instagram: "",
+    tiktok: "",
+  }),
+  operatingHours: jsonb("operating_hours").$type<{
+    monday: { open: string; close: string; closed: boolean };
+    tuesday: { open: string; close: string; closed: boolean };
+    wednesday: { open: string; close: string; closed: boolean };
+    thursday: { open: string; close: string; closed: boolean };
+    friday: { open: string; close: string; closed: boolean };
+    saturday: { open: string; close: string; closed: boolean };
+    sunday: { open: string; close: string; closed: boolean };
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// AI Settings
+export const aiSettings = pgTable("ai_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  openrouterApiKey: text("openrouter_api_key"),
+  preferredModel: text("preferred_model").default("meta-llama/llama-3.1-8b-instruct:free"),
+  autoFillProducts: boolean("auto_fill_products").default(true),
+  marketResearch: boolean("market_research").default(true),
+  competitorAnalysis: boolean("competitor_analysis").default(false),
+  priceOptimization: boolean("price_optimization").default(true),
+  generateTags: boolean("generate_tags").default(true),
+  generateDescriptions: boolean("generate_descriptions").default(true),
+  promptCustomization: text("prompt_customization"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBusinessProfileSchema = createInsertSchema(businessProfile).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAiSettingsSchema = createInsertSchema(aiSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type BusinessProfile = typeof businessProfile.$inferSelect;
+export type InsertBusinessProfile = z.infer<typeof insertBusinessProfileSchema>;
+export type AiSettings = typeof aiSettings.$inferSelect;
+export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;

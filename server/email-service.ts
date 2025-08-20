@@ -92,6 +92,62 @@ ${data.spaName} Team
   });
 }
 
+export async function sendAppointmentCancellation(data: AppointmentReminderData): Promise<boolean> {
+  const subject = `Appointment Cancelled - ${data.spaName}`;
+  
+  const text = `
+Dear ${data.clientName},
+
+We're sorry to inform you that your appointment has been cancelled.
+
+Cancelled Appointment Details:
+Service: ${data.serviceName}
+Date: ${data.appointmentDate}
+Time: ${data.appointmentTime}
+Staff: ${data.staffName}
+
+We apologize for any inconvenience this may cause. Please contact us to reschedule your appointment.
+
+Thank you for your understanding.
+
+Best regards,
+${data.spaName} Team
+  `.trim();
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #dc2626;">Appointment Cancelled</h2>
+      
+      <p>Dear <strong>${data.clientName}</strong>,</p>
+      
+      <p>We're sorry to inform you that your appointment has been <strong>cancelled</strong>.</p>
+      
+      <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+        <h3 style="margin-top: 0; color: #991b1b;">Cancelled Appointment Details</h3>
+        <p><strong>Service:</strong> ${data.serviceName}</p>
+        <p><strong>Date:</strong> ${data.appointmentDate}</p>
+        <p><strong>Time:</strong> ${data.appointmentTime}</p>
+        <p><strong>Staff:</strong> ${data.staffName}</p>
+      </div>
+      
+      <p>We apologize for any inconvenience this may cause.</p>
+      <p><strong>Please contact us to reschedule your appointment.</strong></p>
+      
+      <p>Thank you for your understanding.</p>
+      
+      <p>Best regards,<br><strong>${data.spaName} Team</strong></p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: data.clientEmail,
+    from: data.spaEmail,
+    subject,
+    text,
+    html,
+  });
+}
+
 export async function sendAppointmentReminder(data: AppointmentReminderData): Promise<boolean> {
   const subject = `Reminder: Your appointment tomorrow at ${data.spaName}`;
   

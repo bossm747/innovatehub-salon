@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { appointments, clients, services, staff, notificationSettings, notificationLog } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
-import { sendAppointmentConfirmation, sendAppointmentReminder } from "./email-service";
+import { sendAppointmentConfirmation, sendAppointmentReminder, sendAppointmentCancellation } from "./email-service";
 import { format, addDays, parseISO } from "date-fns";
 
 export async function sendAppointmentNotification(
@@ -80,8 +80,10 @@ export async function sendAppointmentNotification(
     let success = false;
     if (type === 'confirmation') {
       success = await sendAppointmentConfirmation(emailData);
-    } else {
+    } else if (type === 'reminder') {
       success = await sendAppointmentReminder(emailData);
+    } else if (type === 'cancellation') {
+      success = await sendAppointmentCancellation(emailData);
     }
 
     // Log the notification attempt

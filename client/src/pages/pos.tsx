@@ -92,6 +92,7 @@ export default function POS() {
   const [quickCustomerName, setQuickCustomerName] = useState("");
   const [quickCustomerPhone, setQuickCustomerPhone] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedStaff, setSelectedStaff] = useState<any>(null);
 
   const { data: services = [] } = useQuery({
     queryKey: ["/api/services"],
@@ -286,7 +287,7 @@ export default function POS() {
 
     const transactionData = {
       clientId: selectedCustomer?.id,
-      staffId: (staff as any[])[0]?.id, // Default to first staff member
+      staffId: selectedStaff?.id || (staff as any[])[0]?.id, // Use selected staff or default to first
       items: cart,
       subtotal: subtotal.toFixed(2),
       discount: discount.toFixed(2),
@@ -326,6 +327,77 @@ export default function POS() {
             <Trash2 className="mr-2 h-4 w-4" />
             Clear Cart
           </Button>
+        </div>
+
+        {/* Staff & Customer Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Staff Selection */}
+          <Card className="spa-card-shadow bg-gradient-to-r from-indigo-50 to-blue-100 border-indigo-200">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-indigo-500 rounded-full" />
+                <Label className="text-sm font-semibold text-indigo-700">Staff Member</Label>
+              </div>
+              <Select value={selectedStaff?.id || ""} onValueChange={(value) => {
+                const staffMember = (staff as any[])?.find(s => s.id === value);
+                setSelectedStaff(staffMember);
+              }}>
+                <SelectTrigger className="w-full border-indigo-300 focus:border-indigo-500">
+                  <SelectValue placeholder="Select staff member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(staff as any[])?.map((staffMember: any) => (
+                    <SelectItem key={staffMember.id} value={staffMember.id}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                        <span className="font-medium">{staffMember.name}</span>
+                        <span className="text-xs text-slate-500">({staffMember.role})</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
+          {/* Customer Selection */}
+          <Card className="spa-card-shadow bg-gradient-to-r from-emerald-50 to-green-100 border-emerald-200">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+                <Label className="text-sm font-semibold text-emerald-700">Customer</Label>
+              </div>
+              <div className="flex gap-2">
+                <Select value={selectedCustomer?.id || ""} onValueChange={(value) => {
+                  const customer = (clients.data as any[])?.find(c => c.id === value);
+                  setSelectedCustomer(customer);
+                }}>
+                  <SelectTrigger className="flex-1 border-emerald-300 focus:border-emerald-500">
+                    <SelectValue placeholder="Select customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(clients.data as any[])?.map((customer: any) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                          <span className="font-medium">{customer.name}</span>
+                          <span className="text-xs text-slate-500">({customer.email})</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowQuickCustomer(true)}
+                  className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">

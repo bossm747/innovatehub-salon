@@ -10,6 +10,8 @@ import {
   inventoryTransactions,
   campaigns,
   emailLeads,
+  businessProfile,
+  aiSettings,
   type Client,
   type InsertClient,
   type Service,
@@ -36,6 +38,10 @@ import {
   type InsertCampaign,
   type EmailLead,
   type InsertEmailLead,
+  type BusinessProfile,
+  type InsertBusinessProfile,
+  type AiSettings,
+  type InsertAiSettings,
   transactions,
   timeRecords,
   notificationSettings,
@@ -156,6 +162,14 @@ export interface IStorage {
     lowStockProducts: any[];
     topServices: any[];
   }>;
+
+  // Business Profile Settings
+  getBusinessProfile(): Promise<BusinessProfile | undefined>;
+  createOrUpdateBusinessProfile(profile: Partial<InsertBusinessProfile>): Promise<BusinessProfile>;
+
+  // AI Settings
+  getAiSettings(): Promise<AiSettings | undefined>;
+  createOrUpdateAiSettings(settings: Partial<InsertAiSettings>): Promise<AiSettings>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -822,6 +836,52 @@ export class DatabaseStorage implements IStorage {
     });
     
     return report;
+  }
+
+  // Business Profile Settings methods
+  async getBusinessProfile(): Promise<BusinessProfile | undefined> {
+    const [profile] = await db.select().from(businessProfile).limit(1);
+    return profile || undefined;
+  }
+
+  async createOrUpdateBusinessProfile(profile: Partial<InsertBusinessProfile>): Promise<BusinessProfile> {
+    const existingProfile = await this.getBusinessProfile();
+    
+    if (existingProfile) {
+      const [updatedProfile] = await db.update(businessProfile)
+        .set({ ...profile, updatedAt: new Date() })
+        .where(eq(businessProfile.id, existingProfile.id))
+        .returning();
+      return updatedProfile;
+    } else {
+      const [newProfile] = await db.insert(businessProfile)
+        .values({ ...profile, updatedAt: new Date() })
+        .returning();
+      return newProfile;
+    }
+  }
+
+  // AI Settings methods
+  async getAiSettings(): Promise<AiSettings | undefined> {
+    const [settings] = await db.select().from(aiSettings).limit(1);
+    return settings || undefined;
+  }
+
+  async createOrUpdateAiSettings(settings: Partial<InsertAiSettings>): Promise<AiSettings> {
+    const existingSettings = await this.getAiSettings();
+    
+    if (existingSettings) {
+      const [updatedSettings] = await db.update(aiSettings)
+        .set({ ...settings, updatedAt: new Date() })
+        .where(eq(aiSettings.id, existingSettings.id))
+        .returning();
+      return updatedSettings;
+    } else {
+      const [newSettings] = await db.insert(aiSettings)
+        .values({ ...settings, updatedAt: new Date() })
+        .returning();
+      return newSettings;
+    }
   }
 }
 
