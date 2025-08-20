@@ -78,7 +78,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         <img 
           src="/justpause-logo.png" 
           alt="JustPause Salon & Spa" 
-          className="h-12 w-auto drop-shadow-lg"
+          className="h-30 w-auto drop-shadow-lg"
         />
       </div>
       
