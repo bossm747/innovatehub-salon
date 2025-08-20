@@ -72,33 +72,33 @@ export default function Preloader({ onComplete }: PreloaderProps) {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <div className="relative flex items-center justify-center gap-4">
+            <div className="relative flex flex-col items-center justify-center">
+              {/* Logo Image - Bigger and Centered */}
               <motion.img
                 src="/justpause-logo.png"
                 alt="JustPause Salon & Spa"
-                className="h-28 md:h-36 w-auto"
+                className="h-48 md:h-56 lg:h-64 w-auto mb-6 drop-shadow-2xl"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
+              
+              {/* Text Title - Below Logo with Smaller Font */}
               <motion.h1
-                className="text-2xl md:text-4xl text-slate-800 font-normal leading-tight text-center"
+                className="text-lg md:text-2xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 bg-clip-text text-transparent font-bold leading-tight text-center"
                 style={{
                   fontFamily: "'Great Vibes', 'Dancing Script', cursive",
-                  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
               >
-                JustPause<br className="sm:hidden"/>
-                <span className="hidden sm:inline"> </span>
-                Salon & Spa
+                JustPause Salon & Spa
               </motion.h1>
               
               {/* Sparkle Effects */}
               <motion.div
-                className="absolute -top-2 -right-2 text-pink-400 text-2xl"
+                className="absolute -top-4 -right-8 text-pink-400 text-2xl"
                 animate={{
                   rotate: [0, 360],
                   scale: [1, 1.2, 1],
@@ -112,7 +112,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
                 ✨
               </motion.div>
               <motion.div
-                className="absolute bottom-0 -left-4 text-rose-400 text-xl"
+                className="absolute -bottom-2 -left-8 text-rose-400 text-xl"
                 animate={{
                   rotate: [360, 0],
                   scale: [1, 1.1, 1],
