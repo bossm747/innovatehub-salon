@@ -198,15 +198,42 @@ export default function Timesheet() {
 
   // Calculate total hours worked
   const calculateHours = (startTime: string, endTime?: string) => {
-    const start = parseISO(startTime);
-    const end = endTime ? parseISO(endTime) : new Date();
-    return differenceInHours(end, start);
+    if (!startTime) return 0;
+    try {
+      const start = parseISO(startTime);
+      const end = endTime ? parseISO(endTime) : new Date();
+      return differenceInHours(end, start);
+    } catch (error) {
+      console.error('Error calculating hours:', error);
+      return 0;
+    }
   };
 
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
+  };
+
+  // Safe date formatting functions
+  const safeFormatDate = (dateString: string | null | undefined, formatStr: string) => {
+    if (!dateString) return "-";
+    try {
+      return format(parseISO(dateString), formatStr);
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return "-";
+    }
+  };
+
+  const safeDifferenceInMinutes = (date1: Date, dateString: string | null | undefined) => {
+    if (!dateString) return 0;
+    try {
+      return differenceInMinutes(date1, parseISO(dateString));
+    } catch (error) {
+      console.error('Error calculating time difference:', error);
+      return 0;
+    }
   };
 
   return (
@@ -423,7 +450,7 @@ export default function Timesheet() {
                     .filter((record: any) => record.status === 'active')
                     .map((record: any) => {
                       const staffMember = staff.find((s: any) => s.id === record.staffId);
-                      const duration = differenceInMinutes(new Date(), parseISO(record.clockInTime));
+                      const duration = safeDifferenceInMinutes(new Date(), record.clockInTime);
                       
                       return (
                         <div key={record.id} className="p-4 border rounded-lg">
@@ -434,7 +461,7 @@ export default function Timesheet() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mb-1">
-                            Started: {format(parseISO(record.clockInTime), "HH:mm")}
+                            Started: {safeFormatDate(record.clockInTime, "HH:mm")}
                           </p>
                           <p className="text-sm font-medium">
                             Duration: {formatDuration(duration)}
@@ -485,16 +512,13 @@ export default function Timesheet() {
                           {staffMember?.name || 'Unknown Staff'}
                         </TableCell>
                         <TableCell>
-                          {format(parseISO(record.clockInTime), "MMM dd, yyyy")}
+                          {safeFormatDate(record.clockInTime, "MMM dd, yyyy")}
                         </TableCell>
                         <TableCell>
-                          {format(parseISO(record.clockInTime), "HH:mm")}
+                          {safeFormatDate(record.clockInTime, "HH:mm")}
                         </TableCell>
                         <TableCell>
-                          {record.clockOutTime 
-                            ? format(parseISO(record.clockOutTime), "HH:mm")
-                            : "-"
-                          }
+                          {safeFormatDate(record.clockOutTime, "HH:mm")}
                         </TableCell>
                         <TableCell>
                           {record.breakMinutes ? `${record.breakMinutes}m` : "-"}
