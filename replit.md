@@ -14,7 +14,7 @@ This is a comprehensive salon and spa management platform for JustPause Salon & 
 - Enhanced hero section with uploaded background image (/hero-background.jpeg)
 - Implemented stunning animated background with multi-color gradients and enhanced blur effects
 - Fixed mobile header text sizing issue by reducing logo font size for better mobile compatibility
-- Added mobile sticky floating logo overlay on header with z-50 positioning (150% larger size)
+- Added mobile sticky floating logo overlay positioned directly at header level with no top spacing
 - Desktop maintains large floating logo below header
 - Removed mobile header logo/text to make space for overlay
 - Updated testimonials for Dubai/UAE market with authentic local business references
