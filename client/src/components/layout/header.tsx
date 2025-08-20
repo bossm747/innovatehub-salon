@@ -78,7 +78,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         <img 
           src="/justpause-logo-transparent.png" 
           alt="JustPause Salon & Spa" 
-          className="h-20 w-auto mt-0"
+          className="h-16 w-auto mt-0"
           style={{ background: 'transparent' }}
         />
       </div>

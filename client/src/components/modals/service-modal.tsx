@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -61,8 +62,8 @@ export default function ServiceModal({ open, onOpenChange }: ServiceModalProps) 
 
   const createServiceMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertServiceSchema>) => {
-      const response = await apiRequest("POST", "/api/services", data);
-      return response.json();
+      const response = await apiRequest("/api/services", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
@@ -91,6 +92,9 @@ export default function ServiceModal({ open, onOpenChange }: ServiceModalProps) 
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-responsive-lg">Add New Service</DialogTitle>
+          <DialogDescription>
+            Add a new service to your salon and spa catalog
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -54,8 +55,8 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
 
   const createClientMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertClientSchema>) => {
-      const response = await apiRequest("POST", "/api/clients", data);
-      return response.json();
+      const response = await apiRequest("/api/clients", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
@@ -85,6 +86,9 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-responsive-lg">Add New Client</DialogTitle>
+          <DialogDescription>
+            Add a new client to your salon and spa system
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
@@ -197,6 +201,7 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
                       placeholder="Any additional notes about the client..."
                       className="resize-none"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
