@@ -467,3 +467,42 @@ export type BusinessProfile = typeof businessProfile.$inferSelect;
 export type InsertBusinessProfile = z.infer<typeof insertBusinessProfileSchema>;
 export type AiSettings = typeof aiSettings.$inferSelect;
 export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;
+
+// Enhanced Inventory Management
+export const inventoryAlerts = pgTable("inventory_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id),
+  alertType: text("alert_type").notNull(), // 'low_stock', 'out_of_stock', 'overstock'
+  threshold: integer("threshold").notNull(),
+  isActive: boolean("is_active").default(true),
+  lastTriggered: timestamp("last_triggered"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const stockMovements = pgTable("stock_movements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id),
+  movementType: text("movement_type").notNull(), // 'in', 'out', 'adjustment'
+  quantity: integer("quantity").notNull(),
+  reason: text("reason").notNull(), // 'sale', 'purchase', 'waste', 'damage', 'adjustment'
+  previousStock: integer("previous_stock").notNull(),
+  newStock: integer("new_stock").notNull(),
+  notes: text("notes"),
+  staffId: varchar("staff_id").references(() => staff.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertInventoryAlertSchema = createInsertSchema(inventoryAlerts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertStockMovementSchema = createInsertSchema(stockMovements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InventoryAlert = typeof inventoryAlerts.$inferSelect;
+export type InsertInventoryAlert = z.infer<typeof insertInventoryAlertSchema>;
+export type StockMovement = typeof stockMovements.$inferSelect;
+export type InsertStockMovement = z.infer<typeof insertStockMovementSchema>;

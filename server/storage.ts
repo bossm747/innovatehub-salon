@@ -12,6 +12,8 @@ import {
   emailLeads,
   businessProfile,
   aiSettings,
+  inventoryAlerts,
+  stockMovements,
   type Client,
   type InsertClient,
   type Service,
@@ -42,6 +44,10 @@ import {
   type InsertBusinessProfile,
   type AiSettings,
   type InsertAiSettings,
+  type InventoryAlert,
+  type InsertInventoryAlert,
+  type StockMovement,
+  type InsertStockMovement,
   transactions,
   timeRecords,
   notificationSettings,
@@ -341,13 +347,121 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(products).where(sql`${products.currentStock} <= ${products.minStockLevel}`);
   }
 
+  // Enhanced Inventory Alerts
+  async getInventoryAlerts(): Promise<InventoryAlert[]> {
+    return await db.select().from(inventoryAlerts).where(eq(inventoryAlerts.isActive, true));
+  }
+
+  async createInventoryAlert(alertData: InsertInventoryAlert): Promise<InventoryAlert> {
+    const [alert] = await db.insert(inventoryAlerts).values(alertData).returning();
+    return alert;
+  }
+
+  async updateInventoryAlert(id: string, alertData: Partial<InsertInventoryAlert>): Promise<InventoryAlert> {
+    const [alert] = await db.update(inventoryAlerts).set(alertData).where(eq(inventoryAlerts.id, id)).returning();
+    return alert;
+  }
+
+  async deleteInventoryAlert(id: string): Promise<void> {
+    await db.delete(inventoryAlerts).where(eq(inventoryAlerts.id, id));
+  }
+
+  async triggerInventoryAlert(id: string): Promise<void> {
+    await db.update(inventoryAlerts).set({ lastTriggered: new Date() }).where(eq(inventoryAlerts.id, id));
+  }
+
+  // Stock Movement Tracking
+  async getStockMovements(productId?: string, limit: number = 50): Promise<StockMovement[]> {
+    let query = db.select().from(stockMovements).orderBy(desc(stockMovements.createdAt)).limit(limit);
+    
+    if (productId) {
+      query = query.where(eq(stockMovements.productId, productId)) as any;
+    }
+    
+    return await query;
+  }
+
+  async createStockMovement(movementData: InsertStockMovement): Promise<StockMovement> {
+    const [movement] = await db.insert(stockMovements).values(movementData).returning();
+    return movement;
+  }
+
+  async getInventoryOverview(): Promise<{
+    totalProducts: number;
+    lowStockCount: number;
+    outOfStockCount: number;
+    totalValue: number;
+    recentMovements: number;
+  }> {
+    const totalProducts = await db.select({ count: sql`count(*)` }).from(products);
+    const lowStock = await db.select({ count: sql`count(*)` }).from(products).where(sql`${products.currentStock} <= ${products.minStockLevel}`);
+    const outOfStock = await db.select({ count: sql`count(*)` }).from(products).where(eq(products.currentStock, 0));
+    const totalValue = await db.select({ total: sql`sum(${products.currentStock} * ${products.costPrice})` }).from(products);
+    const recentMovements = await db.select({ count: sql`count(*)` }).from(stockMovements).where(sql`${stockMovements.createdAt} >= NOW() - INTERVAL '7 days'`);
+
+    return {
+      totalProducts: Number(totalProducts[0]?.count) || 0,
+      lowStockCount: Number(lowStock[0]?.count) || 0,
+      outOfStockCount: Number(outOfStock[0]?.count) || 0,
+      totalValue: Number(totalValue[0]?.total) || 0,
+      recentMovements: Number(recentMovements[0]?.count) || 0
+    };
+  }
+
+  async checkAndTriggerStockAlerts(productId: string, newStock: number): Promise<void> {
+    const product = await this.getProduct(productId);
+    if (!product) return;
+
+    // Check for low stock alert
+    if (newStock <= (product.minStockLevel || 0) && (product.currentStock || 0) > (product.minStockLevel || 0)) {
+      await this.createInventoryAlert({
+        productId,
+        alertType: 'low_stock',
+        threshold: product.minStockLevel || 0,
+        lastTriggered: new Date()
+      });
+    }
+
+    // Check for out of stock alert
+    if (newStock === 0 && (product.currentStock || 0) > 0) {
+      await this.createInventoryAlert({
+        productId,
+        alertType: 'out_of_stock',
+        threshold: 0,
+        lastTriggered: new Date()
+      });
+    }
+
+    // Check for overstock alert
+    if (product.maxStockLevel && newStock > product.maxStockLevel && (product.currentStock || 0) <= product.maxStockLevel) {
+      await this.createInventoryAlert({
+        productId,
+        alertType: 'overstock',
+        threshold: product.maxStockLevel,
+        lastTriggered: new Date()
+      });
+    }
+  }
+
   async createProduct(product: InsertProduct): Promise<Product> {
-    const [newProduct] = await db.insert(products).values(product).returning();
+    // Transform array fields to comma-separated strings if needed
+    const transformedProduct = {
+      ...product,
+      competitors: Array.isArray(product.competitors) ? product.competitors.join(',') : product.competitors,
+      tags: Array.isArray(product.tags) ? product.tags.join(',') : product.tags
+    };
+    const [newProduct] = await db.insert(products).values([transformedProduct]).returning();
     return newProduct;
   }
 
   async updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product | undefined> {
-    const [updatedProduct] = await db.update(products).set(product).where(eq(products.id, id)).returning();
+    // Transform array fields to comma-separated strings if needed
+    const transformedProduct = {
+      ...product,
+      competitors: Array.isArray(product.competitors) ? product.competitors.join(',') : product.competitors,
+      tags: Array.isArray(product.tags) ? product.tags.join(',') : product.tags
+    };
+    const [updatedProduct] = await db.update(products).set(transformedProduct).where(eq(products.id, id)).returning();
     return updatedProduct || undefined;
   }
 
@@ -441,7 +555,7 @@ export class DatabaseStorage implements IStorage {
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
     const [newTransaction] = await db
       .insert(transactions)
-      .values(transaction)
+      .values([transaction])
       .returning();
     return newTransaction;
   }

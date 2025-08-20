@@ -463,17 +463,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const upload = multer({ 
     storage: storage_multer,
     limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB limit
+      fileSize: 10 * 1024 * 1024, // 10MB limit (increased for better quality)
+      files: 5 // Max 5 files per request
     },
     fileFilter: (req, file, cb) => {
-      const allowedTypes = /jpeg|jpg|png|gif|webp/;
+      const allowedTypes = /jpeg|jpg|png|gif|webp|svg/;
       const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimetype = allowedTypes.test(file.mimetype);
+      const mimetype = allowedTypes.test(file.mimetype) || file.mimetype === 'image/svg+xml';
       
       if (mimetype && extname) {
         return cb(null, true);
       } else {
-        cb(new Error('Invalid file type. Only image files are allowed.'));
+        cb(new Error(`Invalid file type: ${file.mimetype}. Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed.`));
       }
     }
   });
@@ -514,25 +515,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload endpoint for product images
+  // File upload endpoint for product images with optimization
   app.post("/api/upload/product-image", upload.single('image'), async (req, res) => {
+    let filePath = '';
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const imageUrl = `/uploads/products/${req.file.filename}`;
+      filePath = req.file.path;
+      let finalPath = filePath;
+      
+      // Optimize image if not SVG
+      if (!req.file.originalname.toLowerCase().endsWith('.svg')) {
+        try {
+          const sharp = require('sharp');
+          const optimizedPath = filePath.replace(path.extname(filePath), '-optimized.webp');
+          
+          await sharp(filePath)
+            .resize(800, 800, { 
+              fit: 'inside',
+              withoutEnlargement: true 
+            })
+            .webp({ quality: 85 })
+            .toFile(optimizedPath);
+          
+          // Remove original file and use optimized version
+          await fs.unlink(filePath);
+          finalPath = optimizedPath;
+        } catch (optimizationError) {
+          console.warn('Image optimization failed, using original:', optimizationError);
+          // Continue with original file if optimization fails
+        }
+      }
+
+      const fileName = path.basename(finalPath);
+      const imageUrl = `/uploads/products/${fileName}`;
       
       res.json({
         imageUrl,
         imageName: req.file.originalname,
-        fileName: req.file.filename,
-        size: req.file.size
+        fileName,
+        size: (await fs.stat(finalPath)).size,
+        optimized: !req.file.originalname.toLowerCase().endsWith('.svg')
       });
     } catch (error) {
       console.error('File Upload Error:', error);
+      
+      // Cleanup failed upload
+      if (filePath && await fs.access(filePath).then(() => true).catch(() => false)) {
+        await fs.unlink(filePath).catch(() => {});
+      }
+      
       res.status(500).json({ 
-        message: "Failed to upload image",
+        message: "Failed to upload and process image",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Multiple file upload endpoint
+  app.post("/api/upload/product-images", upload.array('images', 5), async (req, res) => {
+    const uploadedFiles: any[] = [];
+    const failedFiles: any[] = [];
+    
+    try {
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+
+      for (const file of req.files) {
+        try {
+          let finalPath = file.path;
+          
+          // Optimize image if not SVG
+          if (!file.originalname.toLowerCase().endsWith('.svg')) {
+            const sharp = require('sharp');
+            const optimizedPath = file.path.replace(path.extname(file.path), '-optimized.webp');
+            
+            await sharp(file.path)
+              .resize(800, 800, { 
+                fit: 'inside',
+                withoutEnlargement: true 
+              })
+              .webp({ quality: 85 })
+              .toFile(optimizedPath);
+            
+            await fs.unlink(file.path);
+            finalPath = optimizedPath;
+          }
+
+          const fileName = path.basename(finalPath);
+          uploadedFiles.push({
+            imageUrl: `/uploads/products/${fileName}`,
+            imageName: file.originalname,
+            fileName,
+            size: (await fs.stat(finalPath)).size,
+            optimized: !file.originalname.toLowerCase().endsWith('.svg')
+          });
+        } catch (fileError) {
+          failedFiles.push({ 
+            name: file.originalname, 
+            error: fileError instanceof Error ? fileError.message : 'Unknown error' 
+          });
+          // Cleanup failed file
+          await fs.unlink(file.path).catch(() => {});
+        }
+      }
+      
+      res.json({
+        uploaded: uploadedFiles,
+        failed: failedFiles,
+        total: req.files.length,
+        successful: uploadedFiles.length
+      });
+    } catch (error) {
+      console.error('Multiple File Upload Error:', error);
+      res.status(500).json({ 
+        message: "Failed to process images",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // File deletion endpoint
+  app.delete("/api/upload/product-image/:filename", async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const filePath = path.join('uploads/products', filename);
+      
+      // Check if file exists
+      try {
+        await fs.access(filePath);
+      } catch {
+        return res.status(404).json({ message: "File not found" });
+      }
+      
+      // Delete the file
+      await fs.unlink(filePath);
+      
+      res.json({ message: "File deleted successfully", filename });
+    } catch (error) {
+      console.error('File Deletion Error:', error);
+      res.status(500).json({ 
+        message: "Failed to delete file",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
@@ -1025,6 +1151,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch marketing stats" });
+    }
+  });
+
+  // Enhanced Inventory Management API Routes
+  app.get("/api/inventory/alerts", async (req, res) => {
+    try {
+      const alerts = await storage.getInventoryAlerts();
+      res.json(alerts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch inventory alerts" });
+    }
+  });
+
+  app.post("/api/inventory/alerts", async (req, res) => {
+    try {
+      const alertData = req.body;
+      const alert = await storage.createInventoryAlert(alertData);
+      res.status(201).json(alert);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create inventory alert" });
+    }
+  });
+
+  app.get("/api/inventory/movements", async (req, res) => {
+    try {
+      const { productId, limit } = req.query;
+      const movements = await storage.getStockMovements(
+        productId as string, 
+        limit ? parseInt(limit as string) : undefined
+      );
+      res.json(movements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch stock movements" });
+    }
+  });
+
+  app.get("/api/inventory/overview", async (req, res) => {
+    try {
+      const overview = await storage.getInventoryOverview();
+      res.json(overview);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch inventory overview" });
+    }
+  });
+
+  // Payment Gateway Endpoints
+  app.post("/api/payments/process", async (req, res) => {
+    try {
+      const { paymentMethod, amount, customerInfo } = req.body;
+      
+      if (!paymentMethod || !amount) {
+        return res.status(400).json({ message: "Payment method and amount are required" });
+      }
+
+      // For cash payments, just return success
+      if (paymentMethod === 'cash') {
+        return res.json({
+          referenceNumber: `CASH-${Date.now()}`,
+          status: 'completed',
+          amount
+        });
+      }
+
+      // For digital payments, process through gateway
+      const paymentData = await paymentGateway.processDigitalPayment(paymentMethod, parseFloat(amount), customerInfo);
+      res.json(paymentData);
+    } catch (error) {
+      console.error('Payment Processing Error:', error);
+      res.status(500).json({ message: (error as Error).message || "Failed to process payment" });
+    }
+  });
+
+  app.get("/api/payments/status/:referenceNumber", async (req, res) => {
+    try {
+      const status = await paymentGateway.checkTransactionStatus(req.params.referenceNumber);
+      res.json(status);
+    } catch (error) {
+      console.error('Payment Status Check Error:', error);
+      res.status(500).json({ message: "Failed to check payment status" });
     }
   });
 
