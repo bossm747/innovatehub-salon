@@ -36,6 +36,10 @@ import { queryClient } from "@/lib/queryClient";
 const appointmentFormSchema = insertAppointmentSchema.extend({
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
+}).refine((data) => {
+  return data.clientId && data.serviceId;
+}, {
+  message: "Client and service are required",
 });
 
 interface AppointmentModalProps {
@@ -103,6 +107,11 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
     if (selectedService) {
       data.duration = selectedService.duration;
       data.totalAmount = selectedService.price.toString();
+    }
+    
+    // Assign to first available staff member if none selected
+    if (!data.staffId && (staff as any[]).length > 0) {
+      data.staffId = (staff as any[])[0].id;
     }
     
     // Convert date and time to proper format
@@ -210,15 +219,14 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
               name="staffId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Therapist (Optional)</FormLabel>
+                  <FormLabel>Therapist</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Any available" />
+                        <SelectValue placeholder="Select a therapist" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="any">Any available</SelectItem>
                       {(staff as any[]).map((member: any) => (
                         <SelectItem key={member.id} value={member.id}>
                           {member.name}
