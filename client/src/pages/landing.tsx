@@ -131,32 +131,29 @@ export default function Landing({ onEnter }: LandingProps) {
           >
             {/* Logo */}
             <div className="mb-8">
-              <div className="flex items-center justify-center gap-6 mb-6">
+              <div className="flex flex-col items-center justify-center mb-6">
                 <motion.img
                   src="/justpause-logo.png"
                   alt="JustPause Salon & Spa"
-                  className="h-32 sm:block md:hidden w-auto"
+                  className="h-48 md:h-56 lg:h-64 w-auto mb-6 drop-shadow-2xl"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1, ease: "easeOut" }}
                 />
                 <motion.h1
-                  className="text-3xl sm:text-4xl md:text-6xl text-slate-800 font-normal leading-tight text-center"
+                  className="text-2xl sm:text-3xl md:text-4xl bg-gradient-to-r from-rose-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-bold leading-tight text-center drop-shadow-lg"
                   style={{
                     fontFamily: "'Great Vibes', 'Dancing Script', cursive",
-                    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                   }}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                 >
-                  JustPause<br className="sm:hidden"/>
-                  <span className="hidden sm:inline"> </span>
-                  Salon & Spa
+                  JustPause Salon & Spa
                 </motion.h1>
               </div>
               <motion.p
-                className="text-2xl md:text-3xl text-slate-600 font-light tracking-wide"
+                className="text-lg md:text-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent font-semibold tracking-wide drop-shadow-sm"
                 style={{ 
                   fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
                   letterSpacing: "0.08em"
@@ -192,20 +189,20 @@ export default function Landing({ onEnter }: LandingProps) {
               transition={{ delay: 0.7, duration: 0.6 }}
               className="flex flex-wrap justify-center gap-4 mb-10"
             >
-              <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CheckCircle className="h-4 w-4 mr-2" />
                 Philippine Payment Methods
               </Badge>
-              <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CheckCircle className="h-4 w-4 mr-2" />
                 SMS & Email Reminders
               </Badge>
-              <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CheckCircle className="h-4 w-4 mr-2" />
                 Mobile Responsive
               </Badge>
-              <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CheckCircle className="h-4 w-4 mr-2" />
                 Real-time Analytics
               </Badge>
             </motion.div>
@@ -219,7 +216,7 @@ export default function Landing({ onEnter }: LandingProps) {
               <Button
                 onClick={onEnter}
                 size="lg"
-                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 hover:from-pink-600 hover:via-orange-600 hover:to-yellow-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
               >
                 Enter Dashboard
                 <ArrowRight className="h-5 w-5 ml-2" />
@@ -268,7 +265,7 @@ export default function Landing({ onEnter }: LandingProps) {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
               Everything You Need to Manage Your Salon
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
@@ -285,9 +282,9 @@ export default function Landing({ onEnter }: LandingProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card className="spa-card-shadow hover:shadow-xl transition-all duration-300 border-0">
+                <Card className="spa-card-shadow hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white via-slate-50 to-gray-100 hover:from-slate-50 hover:via-white hover:to-slate-50">
                   <CardContent className="p-8 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-pink-100 to-rose-100 text-pink-600 mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white mb-6 shadow-lg">
                       {feature.icon}
                     </div>
                     <h3 className="text-xl font-semibold text-slate-800 mb-4">
@@ -305,7 +302,7 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+      <section className="py-20 bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 text-white relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -348,7 +345,7 @@ export default function Landing({ onEnter }: LandingProps) {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
               What Our Clients Say
             </h2>
             <p className="text-xl text-slate-600">
@@ -365,7 +362,7 @@ export default function Landing({ onEnter }: LandingProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <Card className="spa-card-shadow border-0 h-full">
+                <Card className="spa-card-shadow border-0 h-full bg-gradient-to-br from-white via-slate-50 to-gray-100 hover:from-slate-50 hover:via-white hover:to-slate-50 transition-all duration-300 hover:shadow-xl">
                   <CardContent className="p-8">
                     <div className="flex mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
@@ -394,7 +391,7 @@ export default function Landing({ onEnter }: LandingProps) {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: 'url(/salon-bg-2.jpg)' }}
         ></div>
-        <div className="absolute inset-0 bg-pink-50/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/30 to-rose-500/20"></div>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -402,7 +399,7 @@ export default function Landing({ onEnter }: LandingProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl font-bold text-slate-800 mb-6">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-700 via-pink-700 to-rose-700 bg-clip-text text-transparent mb-6 drop-shadow-lg">
               Ready to Transform Your Business?
             </h2>
             <p className="text-xl text-slate-600 mb-10 leading-relaxed">
@@ -411,7 +408,7 @@ export default function Landing({ onEnter }: LandingProps) {
             <Button
               onClick={onEnter}
               size="lg"
-              className="px-10 py-4 text-lg font-semibold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
+              className="px-10 py-4 text-lg font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:via-pink-700 hover:to-rose-700 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
             >
               Get Started Now
               <ArrowRight className="h-5 w-5 ml-2" />
@@ -421,7 +418,7 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-800 text-white">
+      <footer className="py-12 bg-gradient-to-br from-slate-800 via-slate-900 to-black text-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
