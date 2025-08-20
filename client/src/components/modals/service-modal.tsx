@@ -190,6 +190,7 @@ export default function ServiceModal({ open, onOpenChange }: ServiceModalProps) 
                       placeholder="Describe the service..."
                       className="resize-none"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />

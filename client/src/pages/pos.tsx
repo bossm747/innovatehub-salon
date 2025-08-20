@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
@@ -41,60 +42,56 @@ import {
   QrCode,
   Banknote,
   Receipt,
-  X,
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  Clock,
+  Printer,
   UserPlus,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 
-const checkoutSchema = z.object({
+const transactionFormSchema = z.object({
   clientId: z.string().optional(),
   staffId: z.string().min(1, "Staff member is required"),
+  items: z.array(z.object({
+    type: z.enum(['service', 'product']),
+    id: z.string(),
+    name: z.string(),
+    price: z.string(),
+    quantity: z.number(),
+    total: z.string(),
+  })),
+  subtotal: z.string(),
+  discount: z.string().default("0"),
+  tax: z.string().default("0"),
+  total: z.string(),
   paymentMethod: z.enum(["cash", "gcash", "maya", "qrph", "card"]),
   paymentReference: z.string().optional(),
-  discount: z.string().default("0"),
   notes: z.string().optional(),
-  amountPaid: z.string().optional(),
-  customerName: z.string().optional(),
-  customerPhone: z.string().optional(),
 });
-
-const quickCustomerSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  phone: z.string().min(10, "Valid phone number required"),
-  email: z.string().email().optional().or(z.literal("")),
-});
-
-interface CartItem {
-  id: string;
-  type: 'service' | 'product';
-  name: string;
-  price: string;
-  quantity: number;
-  total: string;
-}
 
 export default function POS() {
   const { toast } = useToast();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showQuickCustomer, setShowQuickCustomer] = useState(false);
+  const [cart, setCart] = useState<Array<{
+    id: string;
+    type: 'service' | 'product';
+    name: string;
+    price: string;
+    quantity: number;
+    total: string;
+  }>>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [cashReceived, setCashReceived] = useState(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<any>(null);
+  const [showQuickCustomer, setShowQuickCustomer] = useState(false);
+  const [quickCustomerName, setQuickCustomerName] = useState("");
+  const [quickCustomerPhone, setQuickCustomerPhone] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   const { data: services = [] } = useQuery({
     queryKey: ["/api/services"],
@@ -104,140 +101,167 @@ export default function POS() {
     queryKey: ["/api/products"],
   });
 
-  const { data: clients = [] } = useQuery({
-    queryKey: ["/api/clients"],
-  });
-
   const { data: staff = [] } = useQuery({
     queryKey: ["/api/staff"],
   });
 
-  const form = useForm<z.infer<typeof checkoutSchema>>({
-    resolver: zodResolver(checkoutSchema),
+  const { data: clients = [] } = useQuery({
+    queryKey: ["/api/clients"],
+  });
+
+  const form = useForm<z.infer<typeof transactionFormSchema>>({
+    resolver: zodResolver(transactionFormSchema),
     defaultValues: {
-      clientId: "walk-in",
+      clientId: "",
       staffId: "",
+      items: [],
+      subtotal: "0",
+      discount: "0",
+      tax: "0",
+      total: "0",
       paymentMethod: "cash",
       paymentReference: "",
-      discount: "0",
       notes: "",
-      amountPaid: "",
-      customerName: "",
-      customerPhone: "",
     },
   });
 
-  const customerForm = useForm<z.infer<typeof quickCustomerSchema>>({
-    resolver: zodResolver(quickCustomerSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      email: "",
-    },
-  });
-
-  const processTransactionMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof checkoutSchema>) => {
-      const subtotal = cart.reduce((sum, item) => sum + parseFloat(item.total), 0);
-      const discount = parseFloat(data.discount);
-      const tax = 0; // No tax for now
-      const total = subtotal - discount + tax;
-
-      const transactionData = {
-        ...data,
-        items: cart,
-        subtotal: subtotal.toString(),
-        discount: discount.toString(),
-        tax: tax.toString(),
-        total: total.toString(),
-        paymentStatus: "completed",
-      };
-
-      const response = await apiRequest("POST", "/api/transactions", transactionData);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Transaction Complete",
-        description: `Transaction ${data.transactionNumber} processed successfully`,
+  // Generate service categories dynamically from services data
+  const generateServiceCategories = () => {
+    if (!services) return [{ value: "all", label: "All Services" }];
+    
+    const uniqueCategories = [...new Set((services as any[]).map((service: any) => service.category))];
+    const categories = [{ value: "all", label: "All Services" }];
+    
+    uniqueCategories.forEach(category => {
+      categories.push({
+        value: category,
+        label: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')
       });
-      setLastTransaction(data);
-      setShowReceipt(true);
-      setCart([]);
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Transaction Failed",
-        description: error.message || "Failed to process transaction",
-        variant: "destructive",
-      });
-    },
-  });
+    });
+    
+    return categories;
+  };
+
+  const serviceCategories = generateServiceCategories();
+
+  const paymentMethods = [
+    { value: "cash", label: "Cash", icon: <Banknote className="h-4 w-4" /> },
+    { value: "gcash", label: "GCash", icon: <Smartphone className="h-4 w-4" /> },
+    { value: "maya", label: "Maya (PayMaya)", icon: <Smartphone className="h-4 w-4" /> },
+    { value: "qrph", label: "QR PH", icon: <QrCode className="h-4 w-4" /> },
+    { value: "card", label: "Credit/Debit Card", icon: <CreditCard className="h-4 w-4" /> },
+  ];
+
+  const filteredServices = selectedCategory === "all" 
+    ? (services as any[])
+    : (services as any[]).filter((service: any) => 
+        service.category === selectedCategory
+      );
 
   const addToCart = (item: any, type: 'service' | 'product') => {
-    const existingItem = cart.find(cartItem => cartItem.id === item.id && cartItem.type === type);
-    
-    if (existingItem) {
-      setCart(cart.map(cartItem => 
-        cartItem.id === item.id && cartItem.type === type
-          ? {
-              ...cartItem,
-              quantity: cartItem.quantity + 1,
-              total: (parseFloat(cartItem.price) * (cartItem.quantity + 1)).toString()
-            }
-          : cartItem
-      ));
+    const existingIndex = cart.findIndex(cartItem => 
+      cartItem.id === item.id && cartItem.type === type
+    );
+
+    if (existingIndex >= 0) {
+      const updatedCart = [...cart];
+      updatedCart[existingIndex].quantity += 1;
+      updatedCart[existingIndex].total = (
+        parseFloat(updatedCart[existingIndex].price) * updatedCart[existingIndex].quantity
+      ).toFixed(2);
+      setCart(updatedCart);
     } else {
-      const newItem: CartItem = {
+      const newItem = {
         id: item.id,
         type,
         name: item.name,
-        price: type === 'service' ? item.price : item.retailPrice,
+        price: type === 'service' ? item.price : item.retailPrice || item.costPrice,
         quantity: 1,
-        total: type === 'service' ? item.price : item.retailPrice,
+        total: type === 'service' ? item.price : item.retailPrice || item.costPrice,
       };
       setCart([...cart, newItem]);
     }
-  };
-
-  const updateQuantity = (id: string, type: 'service' | 'product', quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(id, type);
-      return;
-    }
-
-    setCart(cart.map(item => 
-      item.id === id && item.type === type
-        ? {
-            ...item,
-            quantity,
-            total: (parseFloat(item.price) * quantity).toString()
-          }
-        : item
-    ));
   };
 
   const removeFromCart = (id: string, type: 'service' | 'product') => {
     setCart(cart.filter(item => !(item.id === id && item.type === type)));
   };
 
+  const updateQuantity = (id: string, type: 'service' | 'product', newQuantity: number) => {
+    if (newQuantity <= 0) {
+      removeFromCart(id, type);
+      return;
+    }
+
+    const updatedCart = cart.map(item => {
+      if (item.id === id && item.type === type) {
+        return {
+          ...item,
+          quantity: newQuantity,
+          total: (parseFloat(item.price) * newQuantity).toFixed(2)
+        };
+      }
+      return item;
+    });
+    setCart(updatedCart);
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  const subtotal = cart.reduce((sum, item) => sum + parseFloat(item.total), 0);
+  const discount = 0; // Can be implemented later
+  const tax = subtotal * 0.12; // 12% VAT for Philippines
+  const total = subtotal - discount + tax;
+
+  const createTransactionMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("/api/transactions", "POST", data);
+      return response;
+    },
+    onSuccess: (transaction) => {
+      setLastTransaction(transaction);
+      setShowReceipt(true);
+      clearCart();
+      setSelectedCustomer(null);
+      setCashReceived(0);
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Success",
+        description: "Transaction completed successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to process transaction",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createQuickCustomerMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof quickCustomerSchema>) => {
-      const response = await apiRequest("POST", "/api/clients", data);
-      return response.json();
+    mutationFn: async (customerData: any) => {
+      const response = await apiRequest("/api/clients", "POST", {
+        name: customerData.name,
+        phone: customerData.phone || "",
+        email: customerData.email || "",
+        address: "",
+        status: "active"
+      });
+      return response;
     },
     onSuccess: (newClient) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      form.setValue("clientId", newClient.id);
+      setSelectedCustomer(newClient);
       setShowQuickCustomer(false);
-      customerForm.reset();
+      setQuickCustomerName("");
+      setQuickCustomerPhone("");
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       toast({
-        title: "Customer Added",
-        description: `${newClient.firstName} ${newClient.lastName} added successfully`,
+        title: "Success",
+        description: "Customer added successfully",
       });
     },
     onError: (error: any) => {
@@ -249,551 +273,331 @@ export default function POS() {
     },
   });
 
-  const serviceCategories = [
-    { value: "all", label: "All Services" },
-    { value: "facial", label: "Facial" },
-    { value: "massage", label: "Massage" },
-    { value: "hair", label: "Hair" },
-    { value: "nails", label: "Nails" },
-    { value: "body", label: "Body Treatment" },
-  ];
-
-  const filteredServices = selectedCategory === "all" 
-    ? (services as any[])
-    : (services as any[]).filter((service: any) => 
-        service.category?.toLowerCase().includes(selectedCategory.toLowerCase())
-      );
-
-  const subtotal = cart.reduce((sum, item) => sum + parseFloat(item.total), 0);
-  const discount = parseFloat(form.watch('discount') || "0");
-  const tax = 0; // No tax for now
-  const total = subtotal - discount + tax;
-  const amountPaid = parseFloat(form.watch("amountPaid") || "0");
-  const changeAmount = Math.max(0, amountPaid - total);
-
-  const onSubmit = (data: z.infer<typeof checkoutSchema>) => {
-    if (cart.length === 0) {
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    if (paymentMethod === "cash" && cashReceived < total) {
       toast({
-        title: "Empty Cart",
-        description: "Please add items to cart before checkout",
+        title: "Error",
+        description: "Insufficient cash amount",
         variant: "destructive",
       });
       return;
     }
 
-    setIsProcessing(true);
-    processTransactionMutation.mutate(data);
-    setIsProcessing(false);
+    const transactionData = {
+      clientId: selectedCustomer?.id,
+      staffId: (staff as any[])[0]?.id, // Default to first staff member
+      items: cart,
+      subtotal: subtotal.toFixed(2),
+      discount: discount.toFixed(2),
+      tax: tax.toFixed(2),
+      total: total.toFixed(2),
+      paymentMethod,
+      paymentReference: paymentMethod !== "cash" ? `${paymentMethod.toUpperCase()}-${Date.now()}` : undefined,
+      notes: ""
+    };
+
+    createTransactionMutation.mutate(transactionData);
   };
 
-  const paymentMethods = [
-    { value: "cash", label: "Cash", icon: <Banknote className="h-4 w-4" /> },
-    { value: "gcash", label: "GCash", icon: <Smartphone className="h-4 w-4" /> },
-    { value: "maya", label: "Maya (PayMaya)", icon: <Smartphone className="h-4 w-4" /> },
-    { value: "qrph", label: "QR PH", icon: <QrCode className="h-4 w-4" /> },
-    { value: "card", label: "Credit/Debit Card", icon: <CreditCard className="h-4 w-4" /> },
-  ];
+  const createQuickCustomer = () => {
+    if (!quickCustomerName.trim()) return;
+
+    createQuickCustomerMutation.mutate({
+      name: quickCustomerName.trim(),
+      phone: quickCustomerPhone.trim()
+    });
+  };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div>
-        <h2 className="text-responsive-lg font-bold text-slate-900">Point of Sale</h2>
-        <p className="mt-2 text-responsive-base text-slate-600">
-          Process transactions for services and products
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Products and Services */}
-        <div className="space-y-6">
-          {/* Service Categories */}
-          <Card className="spa-card-shadow">
-            <CardHeader>
-              <CardTitle>Service Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {serviceCategories.map((category) => (
-                  <Button
-                    key={category.value}
-                    variant={selectedCategory === category.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category.value)}
-                    className="text-xs"
-                  >
-                    {category.label}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Services */}
-          <Card className="spa-card-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                Services ({filteredServices.length})
-              </CardTitle>
-              <CardDescription>
-                Available spa and salon services
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filteredServices.map((service: any) => (
-                  <div
-                    key={service.id}
-                    className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                    onClick={() => addToCart(service, 'service')}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-sm">{service.name}</h3>
-                      <Badge variant="outline">₱{service.price}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {service.duration} mins • {service.category}
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Products */}
-          <Card className="spa-card-shadow">
-            <CardHeader>
-              <CardTitle>Products</CardTitle>
-              <CardDescription>
-                Available retail products
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(products as any[]).filter((product: any) => product.currentStock > 0).map((product: any) => (
-                  <div
-                    key={product.id}
-                    className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                    onClick={() => addToCart(product, 'product')}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-sm">{product.name}</h3>
-                      <Badge variant="outline">₱{product.retailPrice}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {product.brand} • Stock: {product.currentStock}
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+    <>
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex-responsive justify-between">
+          <div>
+            <h2 className="text-responsive-lg font-bold text-slate-900">Point of Sale</h2>
+            <p className="mt-2 text-responsive-base text-slate-600">Process transactions and manage sales</p>
+          </div>
+          <Button 
+            variant="outline"
+            className="button-responsive"
+            onClick={clearCart}
+            disabled={cart.length === 0}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Clear Cart
+          </Button>
         </div>
 
-        {/* Cart and Checkout */}
-        <div className="space-y-6">
-          {/* Cart */}
-          <Card className="spa-card-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                Cart ({cart.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {cart.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Cart is empty</p>
-                  <p className="text-sm">Add services or products to get started</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {cart.map((item) => (
-                    <div key={`${item.id}-${item.type}`} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{item.name}</h4>
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {item.type} • ₱{item.price} each
-                        </p>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+          {/* Services and Products */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Service Categories */}
+            <div className="flex flex-wrap gap-2">
+              {serviceCategories.map((category) => (
+                <Button
+                  key={category.value}
+                  variant={selectedCategory === category.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.value)}
+                  className="text-sm"
+                >
+                  {category.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Services Grid */}
+            <Card className="spa-card-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="h-5 w-5" />
+                  Services
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {filteredServices.map((service: any) => (
+                    <div
+                      key={service.id}
+                      className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                      onClick={() => addToCart(service, 'service')}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-sm">{service.name}</h3>
+                        <Badge variant="outline">₱{service.price}</Badge>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.id, item.type, item.quantity - 1)}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center text-sm">{item.quantity}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.id, item.type, item.quantity + 1)}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removeFromCart(item.id, item.type)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <div className="ml-4 text-right">
-                        <p className="font-medium">₱{item.total}</p>
-                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {service.duration} min • {service.category}
+                      </p>
+                      <Button size="sm" className="w-full">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
                     </div>
                   ))}
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Subtotal:</span>
-                      <span>₱{subtotal.toFixed(2)}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Products Grid */}
+            <Card className="spa-card-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Products
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {(products as any[]).filter((product: any) => product.currentStock > 0).map((product: any) => (
+                    <div
+                      key={product.id}
+                      className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                      onClick={() => addToCart(product, 'product')}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-sm">{product.name}</h3>
+                        <Badge variant="outline">₱{product.retailPrice}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {product.brand} • Stock: {product.currentStock}
+                      </p>
+                      <Button size="sm" className="w-full">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Discount:</span>
-                      <span>-₱{discount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Tax:</span>
-                      <span>₱{tax.toFixed(2)}</span>
-                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Cart and Checkout */}
+          <div className="space-y-6">
+            {/* Cart */}
+            <Card className="spa-card-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Cart ({cart.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {cart.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Cart is empty</p>
+                    <p className="text-sm">Add services or products to get started</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {cart.map((item) => (
+                      <div key={`${item.id}-${item.type}`} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{item.name}</h4>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {item.type} • ₱{item.price} each
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateQuantity(item.id, item.type, item.quantity - 1)}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateQuantity(item.id, item.type, item.quantity + 1)}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => removeFromCart(item.id, item.type)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="ml-4 text-right">
+                          <p className="font-medium">₱{item.total}</p>
+                        </div>
+                      </div>
+                    ))}
+                    
                     <Separator />
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total:</span>
-                      <span>₱{total.toFixed(2)}</span>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>₱{subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Discount:</span>
+                        <span>-₱{discount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tax:</span>
+                        <span>₱{tax.toFixed(2)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between font-bold text-lg">
+                        <span>Total:</span>
+                        <span>₱{total.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
 
-          {/* Checkout Form */}
-          <Card className="spa-card-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5" />
-                Checkout
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="clientId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center justify-between">
-                          Customer (Optional)
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowQuickCustomer(true)}
-                            className="text-xs"
-                          >
-                            + Add New
-                          </Button>
-                        </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Walk-in customer" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="walk-in">Walk-in customer</SelectItem>
-                            {(clients as any[]).map((client: any) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.firstName} {client.lastName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            {/* Payment Section */}
+            <Card className="spa-card-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Payment Method
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    {paymentMethods.map((method) => (
+                      <Button
+                        key={method.value}
+                        variant={paymentMethod === method.value ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPaymentMethod(method.value)}
+                        className="flex items-center gap-2 justify-start p-3 h-auto"
+                      >
+                        {method.icon}
+                        <span className="text-xs">{method.label}</span>
+                      </Button>
+                    ))}
+                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="staffId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Staff Member *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select staff member" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {(staff as any[]).map((member: any) => (
-                              <SelectItem key={member.id} value={member.id}>
-                                {member.firstName} {member.lastName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Payment Method *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select payment method" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {paymentMethods.map((method) => (
-                              <SelectItem key={method.value} value={method.value}>
-                                <div className="flex items-center gap-2">
-                                  {method.icon}
-                                  {method.label}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {form.watch('paymentMethod') !== 'cash' && (
-                    <FormField
-                      control={form.control}
-                      name="paymentReference"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Reference Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter reference number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                  {paymentMethod === "cash" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="cash-amount">Cash Received</Label>
+                      <Input
+                        id="cash-amount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={cashReceived}
+                        onChange={(e) => setCashReceived(parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                      />
+                      {cashReceived > 0 && (
+                        <div className="text-sm text-muted-foreground">
+                          Change: ₱{Math.max(0, cashReceived - total).toFixed(2)}
+                        </div>
                       )}
-                    />
+                    </div>
                   )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="discount"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Discount (₱)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              placeholder="0.00"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {form.watch("paymentMethod") === "cash" && (
-                      <FormField
-                        control={form.control}
-                        name="amountPaid"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Amount Paid (₱)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder={total.toFixed(2)}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                            {changeAmount > 0 && (
-                              <p className="text-sm text-green-600 font-medium">
-                                Change: ₱{changeAmount.toFixed(2)}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
-                    )}
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Notes</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Additional notes" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <Button 
-                    type="submit" 
                     className="w-full" 
                     size="lg"
-                    disabled={cart.length === 0 || isProcessing}
+                    onClick={handleCheckout}
+                    disabled={cart.length === 0 || (paymentMethod === "cash" && cashReceived < total)}
                   >
-                    {isProcessing ? "Processing..." : `Process Payment ₱${total.toFixed(2)}`}
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Complete Transaction (₱{total.toFixed(2)})
                   </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* Quick Customer Registration Modal */}
-      <Dialog open={showQuickCustomer} onOpenChange={setShowQuickCustomer}>
-        <DialogContent className="spa-modal-shadow">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
-              Add New Customer
-            </DialogTitle>
-            <DialogDescription>
-              Quickly register a new customer for this transaction
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Form {...customerForm}>
-            <form onSubmit={customerForm.handleSubmit((data) => createQuickCustomerMutation.mutate(data))} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={customerForm.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Juan" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={customerForm.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Dela Cruz" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={customerForm.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="09171234567" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={customerForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email (Optional)</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="juan@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowQuickCustomer(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createQuickCustomerMutation.isPending}
-                >
-                  {createQuickCustomerMutation.isPending ? "Adding..." : "Add Customer"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
       {/* Receipt Modal */}
-      <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
-        <DialogContent className="spa-modal-shadow max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Receipt className="h-5 w-5" />
-              Transaction Receipt
-            </DialogTitle>
-          </DialogHeader>
-          
-          {lastTransaction && (
+      {showReceipt && (
+        <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Transaction Complete</DialogTitle>
+              <DialogDescription>
+                Receipt for transaction #{lastTransaction?.transactionNumber}
+              </DialogDescription>
+            </DialogHeader>
             <div className="space-y-4">
               <div className="text-center border-b pb-4">
-                <h3 className="font-bold text-lg">Serenity Spa & Salon</h3>
-                <p className="text-sm text-muted-foreground">
-                  Transaction #{lastTransaction.transactionNumber}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date().toLocaleDateString()} • {new Date().toLocaleTimeString()}
-                </p>
+                <h2 className="text-lg font-bold">JustPause Salon & Spa</h2>
+                <p className="text-sm text-muted-foreground">Thank you for your business!</p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Transaction #:</span>
+                  <span>{lastTransaction?.transactionNumber}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Date:</span>
+                  <span>{new Date().toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Time:</span>
+                  <span>{new Date().toLocaleTimeString()}</span>
+                </div>
+                {selectedCustomer && (
+                  <div className="flex justify-between text-sm">
+                    <span>Customer:</span>
+                    <span>{selectedCustomer.name}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <h4 className="font-medium">Items:</h4>
-                {lastTransaction.items?.map((item: any, index: number) => (
+              <Separator />
+
+              <div className="space-y-1">
+                {lastTransaction?.items.map((item: any, index: number) => (
                   <div key={index} className="flex justify-between text-sm">
                     <span>{item.name} x{item.quantity}</span>
                     <span>₱{item.total}</span>
@@ -801,61 +605,96 @@ export default function POS() {
                 ))}
               </div>
 
-              <div className="border-t pt-4 space-y-2">
-                <div className="flex justify-between">
+              <Separator />
+
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm">
                   <span>Subtotal:</span>
-                  <span>₱{lastTransaction.subtotal}</span>
+                  <span>₱{lastTransaction?.subtotal}</span>
                 </div>
-                {parseFloat(lastTransaction.discount) > 0 && (
-                  <div className="flex justify-between">
-                    <span>Discount:</span>
-                    <span>-₱{lastTransaction.discount}</span>
-                  </div>
-                )}
+                <div className="flex justify-between text-sm">
+                  <span>Discount:</span>
+                  <span>-₱{lastTransaction?.discount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Tax:</span>
+                  <span>₱{lastTransaction?.tax}</span>
+                </div>
                 <div className="flex justify-between font-bold">
                   <span>Total:</span>
-                  <span>₱{lastTransaction.total}</span>
+                  <span>₱{lastTransaction?.total}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span>Payment Method:</span>
-                  <span className="capitalize">{lastTransaction.paymentMethod}</span>
+                  <span className="capitalize">{lastTransaction?.paymentMethod}</span>
                 </div>
-                {lastTransaction.paymentMethod === 'cash' && changeAmount > 0 && (
-                  <div className="flex justify-between">
+                {paymentMethod === "cash" && cashReceived > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span>Cash Received:</span>
+                    <span>₱{cashReceived.toFixed(2)}</span>
+                  </div>
+                )}
+                {paymentMethod === "cash" && cashReceived > 0 && (
+                  <div className="flex justify-between text-sm">
                     <span>Change:</span>
-                    <span>₱{changeAmount.toFixed(2)}</span>
+                    <span>₱{Math.max(0, cashReceived - parseFloat(lastTransaction?.total || "0")).toFixed(2)}</span>
                   </div>
                 )}
               </div>
 
-              <div className="text-center pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
-                  Thank you for visiting!
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Visit us again soon
-                </p>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </Button>
+                <Button className="flex-1" onClick={() => setShowReceipt(false)}>
+                  Done
+                </Button>
               </div>
             </div>
-          )}
+          </DialogContent>
+        </Dialog>
+      )}
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => window.print()}
-              className="flex-1"
-            >
-              Print Receipt
-            </Button>
-            <Button
-              onClick={() => setShowReceipt(false)}
-              className="flex-1"
-            >
-              Close
-            </Button>
-          </DialogFooter>
+      {/* Quick Customer Registration Modal */}
+      <Dialog open={showQuickCustomer} onOpenChange={setShowQuickCustomer}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Quick Customer Registration</DialogTitle>
+            <DialogDescription>
+              Add customer details for this transaction
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="customer-name">Name *</Label>
+              <Input
+                id="customer-name"
+                value={quickCustomerName}
+                onChange={(e) => setQuickCustomerName(e.target.value)}
+                placeholder="Customer name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-phone">Phone</Label>
+              <Input
+                id="customer-phone"
+                value={quickCustomerPhone}
+                onChange={(e) => setQuickCustomerPhone(e.target.value)}
+                placeholder="Phone number"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowQuickCustomer(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={createQuickCustomer} className="flex-1" disabled={!quickCustomerName.trim()}>
+                Add Customer
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

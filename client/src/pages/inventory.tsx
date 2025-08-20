@@ -22,14 +22,7 @@ import SupplierModal from "@/components/modals/supplier-modal";
 import StockAdjustmentModal from "@/components/modals/stock-adjustment-modal";
 import type { Product, Supplier } from "@shared/schema";
 
-const productCategories = [
-  { id: "all", name: "All Products", count: 0 },
-  { id: "hair-care", name: "Hair Care", count: 0 },
-  { id: "skin-care", name: "Skin Care", count: 0 },
-  { id: "tools", name: "Tools", count: 0 },
-  { id: "equipment", name: "Equipment", count: 0 },
-  { id: "retail", name: "Retail", count: 0 },
-];
+// Product categories will be dynamically generated from database
 
 export default function Inventory() {
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -69,18 +62,35 @@ export default function Inventory() {
     );
   }
 
+  // Generate categories dynamically from products data
+  const generateProductCategories = () => {
+    if (!products || products.length === 0) return [{ id: "all", name: "All Products", count: 0 }];
+    
+    const uniqueCategories = [...new Set(products.map((product: any) => product.category))];
+    const categories = [
+      { id: "all", name: "All Products", count: products.length }
+    ];
+    
+    uniqueCategories.forEach(category => {
+      const count = products.filter(p => p.category === category).length;
+      categories.push({
+        id: category,
+        name: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' '),
+        count
+      });
+    });
+    
+    return categories;
+  };
+
+  const categoriesWithCounts = generateProductCategories();
+
   const filteredProducts = (products || []).filter((product: any) => {
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (product.brand && product.brand.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
-
-  // Update category counts
-  const categoriesWithCounts = productCategories.map(cat => ({
-    ...cat,
-    count: cat.id === "all" ? products?.length || 0 : products?.filter((p: any) => p.category === cat.id).length || 0
-  }));
 
   // Calculate totals
   const totalProducts = products?.length || 0;

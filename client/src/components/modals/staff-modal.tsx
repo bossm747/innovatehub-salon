@@ -107,8 +107,8 @@ export default function StaffModal({ open, onOpenChange }: StaffModalProps) {
 
   const createStaffMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertStaffSchema>) => {
-      const response = await apiRequest("POST", "/api/staff", data);
-      return response.json();
+      const response = await apiRequest("/api/staff", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
@@ -142,6 +142,9 @@ export default function StaffModal({ open, onOpenChange }: StaffModalProps) {
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-responsive-lg">Add Staff Member</DialogTitle>
+          <DialogDescription>
+            Add a new staff member to your salon and spa team
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

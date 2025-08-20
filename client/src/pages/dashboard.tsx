@@ -103,7 +103,7 @@ export default function Dashboard() {
                 <div className="ml-4 lg:ml-6">
                   <p className="text-responsive-sm font-medium text-slate-600">Daily Revenue</p>
                   <p className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-slate-900">
-                    AED {typeof stats?.dailyRevenue === 'number' ? stats.dailyRevenue.toFixed(2) : parseFloat(stats?.dailyRevenue || "0").toFixed(2)}
+                    ₱{typeof stats?.dailyRevenue === 'number' ? stats.dailyRevenue.toFixed(2) : parseFloat(stats?.dailyRevenue || "0").toFixed(2)}
                   </p>
                 </div>
               </div>

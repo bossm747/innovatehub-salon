@@ -6,14 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Star, Scissors } from "lucide-react";
 import ServiceModal from "@/components/modals/service-modal";
 
-const categories = [
-  { id: "all", name: "All Services", count: 0 },
-  { id: "massage", name: "Massage", count: 0 },
-  { id: "facial", name: "Facial", count: 0 },
-  { id: "body-treatment", name: "Body Treatment", count: 0 },
-  { id: "hair", name: "Hair", count: 0 },
-  { id: "nail-care", name: "Nail Care", count: 0 },
-];
+// Service categories will be dynamically generated from database
 
 export default function Services() {
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
@@ -41,15 +34,32 @@ export default function Services() {
     );
   }
 
+  // Generate categories dynamically from services data
+  const generateCategories = () => {
+    if (!services) return [{ id: "all", name: "All Services", count: 0 }];
+    
+    const uniqueCategories = [...new Set((services as any[]).map((service: any) => service.category))];
+    const categories = [
+      { id: "all", name: "All Services", count: services.length }
+    ];
+    
+    uniqueCategories.forEach(category => {
+      const count = (services as any[]).filter(s => s.category === category).length;
+      categories.push({
+        id: category,
+        name: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' '),
+        count
+      });
+    });
+    
+    return categories;
+  };
+
+  const categoriesWithCounts = generateCategories();
+
   const filteredServices = services?.filter((service: any) => 
     selectedCategory === "all" || service.category === selectedCategory
   ) || [];
-
-  // Update category counts
-  const categoriesWithCounts = categories.map(cat => ({
-    ...cat,
-    count: cat.id === "all" ? services?.length || 0 : services?.filter((s: any) => s.category === cat.id).length || 0
-  }));
 
   return (
     <>

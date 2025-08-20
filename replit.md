@@ -25,6 +25,9 @@ This is a comprehensive salon and spa management platform for JustPause Salon & 
 - Applied consistent Inter font typography with uppercase and wide letter spacing
 - Integrated WhatsApp contact (+971 50 290 0752) and Facebook page reference
 - Updated contact information to Dubai, UAE location
+- Transition to Philippines market: Converting all currency from AED to PHP (₱)
+- Replaced all static/mock data with live production database integration
+- Dynamic category generation from database data instead of hardcoded arrays
 
 ## User Preferences
 
