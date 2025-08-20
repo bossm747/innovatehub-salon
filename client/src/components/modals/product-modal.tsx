@@ -82,8 +82,8 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
 
   const createProductMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertProductSchema>) => {
-      const response = await apiRequest("POST", "/api/products", data);
-      return response.json();
+      const response = await apiRequest("/api/products", "POST", data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });

@@ -104,7 +104,7 @@ export default function EnhancedProductModal({ open, onOpenChange }: EnhancedPro
 
   const createProductMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertProductSchema>) => {
-      const response = await apiRequest("POST", "/api/products", data);
+      const response = await apiRequest("/api/products", "POST", data);
       return response;
     },
     onSuccess: () => {

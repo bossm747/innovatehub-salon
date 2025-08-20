@@ -61,7 +61,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 bg-gradient-to-r from-primary/5 to-secondary/5">
           <div className="flex items-center space-x-3">
-            <SalonLogo size="sm" showSubtext={false} showImage={true} />
+            <div className="md:hidden">
+              <SalonLogo size="sm" showSubtext={false} showImage={true} />
+            </div>
+            <div className="hidden md:block">
+              <h2 className="text-lg font-bold text-slate-900">JustPause</h2>
+              <p className="text-xs text-slate-500">Salon & Spa</p>
+            </div>
           </div>
           <button 
             onClick={onClose}

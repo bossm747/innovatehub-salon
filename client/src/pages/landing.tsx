@@ -135,7 +135,7 @@ export default function Landing({ onEnter }: LandingProps) {
                 <motion.img
                   src="/justpause-logo.png"
                   alt="JustPause Salon & Spa"
-                  className="h-32 md:h-40 w-auto"
+                  className="h-32 sm:block md:hidden w-auto"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1, ease: "easeOut" }}

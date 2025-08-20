@@ -109,8 +109,8 @@ export default function Marketing() {
 
   const createCampaignMutation = useMutation({
     mutationFn: async (data: z.infer<typeof campaignSchema>) => {
-      const response = await apiRequest("POST", "/api/marketing/campaigns", data);
-      return response.json();
+      const response = await apiRequest("/api/marketing/campaigns", "POST", data);
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -132,8 +132,8 @@ export default function Marketing() {
 
   const sendCampaignMutation = useMutation({
     mutationFn: async (campaignId: string) => {
-      const response = await apiRequest("POST", `/api/marketing/campaigns/${campaignId}/send`);
-      return response.json();
+      const response = await apiRequest(`/api/marketing/campaigns/${campaignId}/send`, "POST");
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -151,7 +151,7 @@ export default function Marketing() {
       formData.append("csv", file);
 
       // Simulate upload progress
-      const uploadPromise = apiRequest("POST", "/api/marketing/leads/upload", formData);
+      const uploadPromise = apiRequest("/api/marketing/leads/upload", "POST", formData);
       
       // Mock progress updates
       let progress = 0;
@@ -167,12 +167,12 @@ export default function Marketing() {
       clearInterval(progressInterval);
       setUploadProgress(100);
       
-      return response.json();
+      return response;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast({
         title: "Leads Uploaded",
-        description: `Successfully uploaded ${data.count} leads from CSV file.`,
+        description: `Successfully uploaded ${data?.count || 0} leads from CSV file.`,
       });
       setCsvFile(null);
       setUploadProgress(0);
@@ -190,8 +190,8 @@ export default function Marketing() {
 
   const deleteCampaignMutation = useMutation({
     mutationFn: async (campaignId: string) => {
-      const response = await apiRequest("DELETE", `/api/marketing/campaigns/${campaignId}`);
-      return response.json();
+      const response = await apiRequest(`/api/marketing/campaigns/${campaignId}`, "DELETE");
+      return response;
     },
     onSuccess: () => {
       toast({

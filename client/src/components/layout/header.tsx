@@ -83,14 +83,7 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
         />
       </div>
       
-      {/* Desktop Floating Logo */}
-      <div className="hidden lg:flex justify-center">
-        <img 
-          src="/justpause-logo.png" 
-          alt="JustPause Salon & Spa" 
-          className="h-48 md:h-64 lg:h-80 w-auto"
-        />
-      </div>
+
     </>
   );
 }
