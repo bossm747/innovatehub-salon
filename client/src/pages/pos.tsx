@@ -85,7 +85,7 @@ export default function POS() {
   }>>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [cashReceived, setCashReceived] = useState(0);
+  const [cashReceived, setCashReceived] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<any>(null);
   const [showQuickCustomer, setShowQuickCustomer] = useState(false);
@@ -226,7 +226,7 @@ export default function POS() {
       setShowReceipt(true);
       clearCart();
       setSelectedCustomer(null);
-      setCashReceived(0);
+      setCashReceived("");
       queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
@@ -276,7 +276,8 @@ export default function POS() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    if (paymentMethod === "cash" && cashReceived < total) {
+    const cashAmount = parseFloat(cashReceived.toString()) || 0;
+    if (paymentMethod === "cash" && cashAmount < total) {
       toast({
         title: "Error",
         description: "Insufficient cash amount",
@@ -638,11 +639,11 @@ export default function POS() {
                         min="0"
                         step="0.01"
                         value={cashReceived}
-                        onChange={(e) => setCashReceived(parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
+                        onChange={(e) => setCashReceived(e.target.value)}
+                        placeholder="Enter amount received"
                         className="mt-2 text-lg font-bold text-center border-green-300 focus:border-green-500"
                       />
-                      {cashReceived > 0 && (
+                      {parseFloat(cashReceived.toString()) > 0 && (
                         <div className="mt-2 p-2 bg-white rounded border border-green-200">
                           <div className="flex justify-between text-sm">
                             <span className="text-slate-600">Total Due:</span>
@@ -650,11 +651,11 @@ export default function POS() {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-slate-600">Cash Received:</span>
-                            <span className="font-bold">₱{cashReceived.toFixed(2)}</span>
+                            <span className="font-bold">₱{parseFloat(cashReceived.toString()).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-lg font-bold text-green-600 border-t pt-1 mt-1">
                             <span>Change:</span>
-                            <span>₱{Math.max(0, cashReceived - total).toFixed(2)}</span>
+                            <span>₱{Math.max(0, parseFloat(cashReceived.toString()) - total).toFixed(2)}</span>
                           </div>
                         </div>
                       )}
@@ -664,7 +665,7 @@ export default function POS() {
                   <Button 
                     className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-6 text-lg font-bold" 
                     onClick={handleCheckout}
-                    disabled={cart.length === 0 || (paymentMethod === "cash" && cashReceived < total)}
+                    disabled={cart.length === 0 || (paymentMethod === "cash" && parseFloat(cashReceived.toString()) < total)}
                   >
                     <ShoppingCart className="h-5 w-5 mr-2" />
                     Complete Transaction • ₱{total.toFixed(2)}
@@ -762,15 +763,15 @@ export default function POS() {
                   <span>Payment:</span>
                   <span className="uppercase font-medium">{lastTransaction?.paymentMethod}</span>
                 </div>
-                {paymentMethod === "cash" && cashReceived > 0 && (
+                {paymentMethod === "cash" && parseFloat(cashReceived.toString()) > 0 && (
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Cash Received:</span>
-                      <span>₱{cashReceived.toFixed(2)}</span>
+                      <span>₱{parseFloat(cashReceived.toString()).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-xs font-bold">
                       <span>Change:</span>
-                      <span>₱{Math.max(0, cashReceived - parseFloat(lastTransaction?.total || "0")).toFixed(2)}</span>
+                      <span>₱{Math.max(0, parseFloat(cashReceived.toString()) - parseFloat(lastTransaction?.total || "0")).toFixed(2)}</span>
                     </div>
                   </>
                 )}
