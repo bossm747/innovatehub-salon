@@ -82,20 +82,20 @@ export default function Landing({ onEnter }: LandingProps) {
 
   const testimonials = [
     {
-      name: "Fatima Al-Rashid",
-      role: "Spa Owner, Dubai Marina",
+      name: "Maria Santos",
+      role: "Spa Owner, Balayan Batangas",
       rating: 5,
       comment: "This system transformed how we manage our spa. Bookings are up 40% since we started using it!"
     },
     {
-      name: "Ahmed Hassan",
-      role: "Salon Manager, JBR", 
+      name: "Jose Dela Cruz",
+      role: "Salon Manager, Balayan Town Center", 
       rating: 5,
       comment: "The POS system is perfect for our walk-in customers. Payment integration works flawlessly."
     },
     {
-      name: "Sarah Al-Mansouri",
-      role: "Beauty Center Director, Downtown",
+      name: "Ana Villanueva",
+      role: "Beauty Center Director, Poblacion Balayan",
       rating: 5,
       comment: "Client management has never been easier. Our customers love the automated reminders."
     }
@@ -458,7 +458,7 @@ export default function Landing({ onEnter }: LandingProps) {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-3" />
-                  <span>Dubai, UAE</span>
+                  <span>Balayan, Batangas, Philippines</span>
                 </div>
                 <div className="flex items-center">
                   <svg className="h-4 w-4 mr-3 text-green-400" fill="currentColor" viewBox="0 0 24 24">
