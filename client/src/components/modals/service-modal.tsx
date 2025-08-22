@@ -64,14 +64,21 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
 
   const createServiceMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertServiceSchema>) => {
-      const response = await apiRequest("/api/services", "POST", data);
-      return response;
+      if (service?.id) {
+        // Update existing service
+        const response = await apiRequest(`/api/services/${service.id}`, "PUT", data);
+        return response;
+      } else {
+        // Create new service
+        const response = await apiRequest("/api/services", "POST", data);
+        return response;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
       toast({
         title: "Success",
-        description: "Service added successfully",
+        description: service?.id ? "Service updated successfully" : "Service added successfully",
       });
       onOpenChange(false);
       form.reset();
@@ -79,7 +86,7 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to add service",
+        description: error.message || (service?.id ? "Failed to update service" : "Failed to add service"),
         variant: "destructive",
       });
     },
@@ -116,6 +123,29 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
 
     createServiceMutation.mutate(data);
   };
+
+  // Reset form when modal opens/closes or service changes
+  useEffect(() => {
+    if (open && service) {
+      form.reset({
+        name: service.name || "",
+        description: service.description || "",
+        category: service.category || "",
+        duration: service.duration || 60,
+        price: service.price || "0",
+        isActive: service.isActive ?? true,
+      });
+    } else if (open && !service) {
+      form.reset({
+        name: "",
+        description: "",
+        category: "",
+        duration: 60,
+        price: "0",
+        isActive: true,
+      });
+    }
+  }, [open, service, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

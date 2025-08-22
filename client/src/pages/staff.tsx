@@ -1,17 +1,41 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Star, Bus, Calendar, Edit, MessageCircle } from "lucide-react";
+import { UserPlus, Star, Bus, Calendar, Edit, MessageCircle, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import StaffModal from "@/components/modals/staff-modal";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Staff() {
   const [staffModalOpen, setStaffModalOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<any>(null);
+  const { toast } = useToast();
 
   const { data: staff, isLoading } = useQuery({
     queryKey: ["/api/staff"],
+  });
+
+  const deleteStaffMutation = useMutation({
+    mutationFn: (staffId: string) => 
+      apiRequest(`/api/staff/${staffId}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
+      toast({
+        title: "Success",
+        description: "Staff member removed successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to remove staff member",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -108,14 +132,43 @@ export default function Staff() {
                       View Schedule
                     </Button>
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => {
+                          setEditingStaff(member);
+                          setStaffModalOpen(true);
+                        }}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        Message
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="flex-1 text-destructive hover:text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Remove
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove Staff Member</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to remove {member.name} from staff? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteStaffMutation.mutate(member.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              {deleteStaffMutation.isPending ? "Removing..." : "Remove Staff"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardContent>
@@ -127,7 +180,11 @@ export default function Staff() {
 
       <StaffModal 
         open={staffModalOpen} 
-        onOpenChange={setStaffModalOpen} 
+        onOpenChange={(open) => {
+          setStaffModalOpen(open);
+          if (!open) setEditingStaff(null);
+        }}
+        staff={editingStaff}
       />
     </>
   );

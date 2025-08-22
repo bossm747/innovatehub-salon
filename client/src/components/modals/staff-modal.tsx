@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertStaffSchema } from "@shared/schema";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ import { queryClient } from "@/lib/queryClient";
 interface StaffModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  staff?: any; // For editing existing staff member
 }
 
 // Common salon and spa specialties
@@ -89,32 +91,39 @@ const SALON_SPA_SPECIALTIES = [
   "Permanent Makeup"
 ];
 
-export default function StaffModal({ open, onOpenChange }: StaffModalProps) {
+export default function StaffModal({ open, onOpenChange, staff }: StaffModalProps) {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof insertStaffSchema>>({
     resolver: zodResolver(insertStaffSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      role: "",
-      specialties: [],
-      experience: 0,
-      isActive: true,
+      name: staff?.name || "",
+      email: staff?.email || "",
+      phone: staff?.phone || "",
+      role: staff?.role || "",
+      specialties: staff?.specialties || [],
+      experience: staff?.experience || 0,
+      isActive: staff?.isActive ?? true,
     },
   });
 
   const createStaffMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertStaffSchema>) => {
-      const response = await apiRequest("/api/staff", "POST", data);
-      return response;
+      if (staff?.id) {
+        // Update existing staff
+        const response = await apiRequest(`/api/staff/${staff.id}`, "PUT", data);
+        return response;
+      } else {
+        // Create new staff
+        const response = await apiRequest("/api/staff", "POST", data);
+        return response;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
       toast({
         title: "Success",
-        description: "Staff member added successfully",
+        description: staff?.id ? "Staff member updated successfully" : "Staff member added successfully",
       });
       onOpenChange(false);
       form.reset();
@@ -122,7 +131,7 @@ export default function StaffModal({ open, onOpenChange }: StaffModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to add staff member",
+        description: error.message || (staff?.id ? "Failed to update staff member" : "Failed to add staff member"),
         variant: "destructive",
       });
     },
