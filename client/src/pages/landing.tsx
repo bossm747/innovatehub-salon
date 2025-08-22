@@ -274,29 +274,47 @@ export default function Landing({ onEnter }: LandingProps) {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <Card className="spa-card-shadow hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white via-slate-50 to-gray-100 hover:from-slate-50 hover:via-white hover:to-slate-50">
-                  <CardContent className="p-8 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white mb-6 shadow-lg">
-                      {feature.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold text-slate-800 mb-4">
-                      {feature.title}
-                    </h3>
-                    <p className="text-slate-600 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {features.map((feature, index) => {
+              const cardGradients = [
+                "bg-gradient-to-br from-rose-50 via-pink-50 to-rose-100 hover:from-rose-100 hover:via-pink-100 hover:to-rose-50",
+                "bg-gradient-to-br from-lavender-50 via-purple-50 to-lavender-100 hover:from-lavender-100 hover:via-purple-100 hover:to-lavender-50", 
+                "bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 hover:from-emerald-100 hover:via-teal-100 hover:to-cyan-50",
+                "bg-gradient-to-br from-amber-50 via-orange-50 to-peach-100 hover:from-amber-100 hover:via-orange-100 hover:to-peach-50",
+                "bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-100 hover:from-sky-100 hover:via-cyan-100 hover:to-blue-50",
+                "bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-100 hover:from-violet-100 hover:via-indigo-100 hover:to-purple-50"
+              ];
+              const iconGradients = [
+                "bg-gradient-to-r from-rose-400 to-pink-500",
+                "bg-gradient-to-r from-purple-400 to-violet-500",
+                "bg-gradient-to-r from-emerald-400 to-teal-500",
+                "bg-gradient-to-r from-amber-400 to-orange-500",
+                "bg-gradient-to-r from-cyan-400 to-blue-500",
+                "bg-gradient-to-r from-violet-400 to-indigo-500"
+              ];
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <Card className={`spa-card-shadow hover:shadow-xl transition-all duration-300 border-0 ${cardGradients[index % cardGradients.length]}`}>
+                    <CardContent className="p-8 text-center">
+                      <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${iconGradients[index % iconGradients.length]} text-white mb-6 shadow-lg`}>
+                        {feature.icon}
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-800 mb-4">
+                        {feature.title}
+                      </h3>
+                      <p className="text-slate-600 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -354,32 +372,39 @@ export default function Landing({ onEnter }: LandingProps) {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-              >
-                <Card className="spa-card-shadow border-0 h-full bg-gradient-to-br from-white via-slate-50 to-gray-100 hover:from-slate-50 hover:via-white hover:to-slate-50 transition-all duration-300 hover:shadow-xl">
-                  <CardContent className="p-8">
-                    <div className="flex mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-slate-600 mb-6 italic leading-relaxed">
-                      "{testimonial.comment}"
-                    </p>
-                    <div>
-                      <div className="font-semibold text-slate-800">{testimonial.name}</div>
-                      <div className="text-sm text-slate-500">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {testimonials.map((testimonial, index) => {
+              const testimonialGradients = [
+                "bg-gradient-to-br from-rose-50/80 via-pink-50/60 to-rose-100/80 hover:from-rose-100/90 hover:via-pink-100/70 hover:to-rose-50/90",
+                "bg-gradient-to-br from-lavender-50/80 via-purple-50/60 to-violet-100/80 hover:from-lavender-100/90 hover:via-purple-100/70 hover:to-violet-50/90",
+                "bg-gradient-to-br from-emerald-50/80 via-mint-50/60 to-teal-100/80 hover:from-emerald-100/90 hover:via-mint-100/70 hover:to-teal-50/90"
+              ];
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                >
+                  <Card className={`spa-card-shadow border-0 h-full ${testimonialGradients[index]} transition-all duration-300 hover:shadow-xl backdrop-blur-sm`}>
+                    <CardContent className="p-8">
+                      <div className="flex mb-4">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="h-5 w-5 text-amber-400 fill-current drop-shadow-sm" />
+                        ))}
+                      </div>
+                      <p className="text-slate-700 mb-6 italic leading-relaxed">
+                        "{testimonial.comment}"
+                      </p>
+                      <div>
+                        <div className="font-semibold text-slate-800">{testimonial.name}</div>
+                        <div className="text-sm text-slate-600">{testimonial.role}</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
