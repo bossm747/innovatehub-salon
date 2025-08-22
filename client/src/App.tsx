@@ -50,13 +50,7 @@ function App() {
   const [showDocs, setShowDocs] = useState(false);
   const [appState, setAppState] = useState<'loading' | 'landing' | 'app'>('loading');
 
-  // Check if user has visited before
-  useEffect(() => {
-    const hasVisited = localStorage.getItem('serenity-spa-visited');
-    if (hasVisited) {
-      setAppState('app');
-    }
-  }, []);
+  // Always show preloader and landing page on every load
 
   const handlePreloaderComplete = () => {
     setAppState('landing');
