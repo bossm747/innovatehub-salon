@@ -45,7 +45,12 @@ export default function Dashboard() {
     },
   });
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery<{
+    todayAppointments: number;
+    dailyRevenue: number | string;
+    totalClients: number;
+    monthlyRevenue: number | string;
+  }>({
     queryKey: ["/api/dashboard/stats"],
   });
 

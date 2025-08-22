@@ -12,6 +12,8 @@ import AppointmentModal from "@/components/modals/appointment-modal";
 export default function Appointments() {
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const { toast } = useToast();
 
   const { data: appointments, isLoading } = useQuery({
@@ -43,6 +45,26 @@ export default function Appointments() {
     },
   });
 
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: (appointmentId: string) => 
+      apiRequest(`/api/appointments/${appointmentId}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Success",
+        description: "Appointment deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete appointment",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-6 sm:space-y-8">
@@ -55,13 +77,19 @@ export default function Appointments() {
 
   // Generate calendar days for current month
   const generateCalendarDays = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
+    const startDate = firstDay.getDay(); // Day of week for first day
     const days = [];
 
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startDate; i++) {
+      days.push(null);
+    }
+
+    // Add all days of the month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(i);
     }
@@ -101,13 +129,36 @@ export default function Appointments() {
         <Card className="mb-8 spa-card-shadow hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-sky-50 to-blue-100 border-sky-200">
           <CardHeader className="pb-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <CardTitle className="text-responsive-lg">December 2024</CardTitle>
+              <CardTitle className="text-responsive-lg">
+                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </CardTitle>
               <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                <Button variant="ghost" size="sm" className="hover:bg-primary/10">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="hover:bg-primary/10"
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm" className="border-primary/20 hover:bg-primary/10">Today</Button>
-                <Button variant="ghost" size="sm" className="hover:bg-primary/10">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-primary/20 hover:bg-primary/10"
+                  onClick={() => {
+                    const today = new Date();
+                    setCurrentMonth(today);
+                    setSelectedDate(today.toISOString().split('T')[0]);
+                  }}
+                >
+                  Today
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="hover:bg-primary/10"
+                  onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -120,16 +171,21 @@ export default function Appointments() {
                 <div key={day} className="font-medium text-slate-600 py-2">{day}</div>
               ))}
               
-              {/* Empty cells for month start */}
-              {Array.from({ length: 3 }, (_, i) => (
-                <div key={`empty-${i}`} className="py-2"></div>
-              ))}
-              
               {/* Calendar days */}
-              {calendarDays.map(day => {
-                const dateStr = `2024-12-${day.toString().padStart(2, '0')}`;
+              {calendarDays.map((day, index) => {
+                if (day === null) {
+                  return <div key={`empty-${index}`} className="py-2"></div>;
+                }
+                
+                const year = currentMonth.getFullYear();
+                const month = currentMonth.getMonth() + 1;
+                const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
                 const isSelected = selectedDate === dateStr;
-                const isToday = day === currentDay;
+                const today = new Date();
+                const isToday = 
+                  day === today.getDate() && 
+                  currentMonth.getMonth() === today.getMonth() && 
+                  currentMonth.getFullYear() === today.getFullYear();
                 
                 return (
                   <button
@@ -196,7 +252,14 @@ export default function Appointments() {
                         </Badge>
                         {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                           <>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                setEditingAppointment(appointment);
+                                setAppointmentModalOpen(true);
+                              }}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <AlertDialog>
@@ -223,9 +286,30 @@ export default function Appointments() {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to permanently delete this appointment for {appointment.clientName}? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Keep Appointment</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => deleteAppointmentMutation.mutate(appointment.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    {deleteAppointmentMutation.isPending ? "Deleting..." : "Delete Permanently"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </>
                         )}
                       </div>
@@ -241,7 +325,11 @@ export default function Appointments() {
 
       <AppointmentModal 
         open={appointmentModalOpen} 
-        onOpenChange={setAppointmentModalOpen} 
+        onOpenChange={(open) => {
+          setAppointmentModalOpen(open);
+          if (!open) setEditingAppointment(null);
+        }}
+        appointment={editingAppointment}
       />
     </>
   );

@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertClientSchema } from "@shared/schema";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -35,35 +36,43 @@ import { queryClient } from "@/lib/queryClient";
 interface ClientModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  client?: any; // For editing existing client
 }
 
-export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
+export default function ClientModal({ open, onOpenChange, client }: ClientModalProps) {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof insertClientSchema>>({
     resolver: zodResolver(insertClientSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      dateOfBirth: "",
-      notes: "",
-      status: "active",
+      name: client?.name || "",
+      email: client?.email || "",
+      phone: client?.phone || "",
+      address: client?.address || "",
+      dateOfBirth: client?.dateOfBirth || "",
+      notes: client?.notes || "",
+      status: client?.status || "active",
     },
   });
 
   const createClientMutation = useMutation({
     mutationFn: async (data: z.infer<typeof insertClientSchema>) => {
-      const response = await apiRequest("/api/clients", "POST", data);
-      return response;
+      if (client?.id) {
+        // Update existing client
+        const response = await apiRequest(`/api/clients/${client.id}`, "PUT", data);
+        return response;
+      } else {
+        // Create new client
+        const response = await apiRequest("/api/clients", "POST", data);
+        return response;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Success",
-        description: "Client added successfully",
+        description: client?.id ? "Client updated successfully" : "Client added successfully",
       });
       onOpenChange(false);
       form.reset();
@@ -71,7 +80,7 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to add client",
+        description: error.message || (client?.id ? "Failed to update client" : "Failed to add client"),
         variant: "destructive",
       });
     },
@@ -105,13 +114,40 @@ export default function ClientModal({ open, onOpenChange }: ClientModalProps) {
     createClientMutation.mutate(data);
   };
 
+  // Reset form when modal opens/closes or client changes
+  useEffect(() => {
+    if (open && client) {
+      form.reset({
+        name: client.name || "",
+        email: client.email || "",
+        phone: client.phone || "",
+        address: client.address || "",
+        dateOfBirth: client.dateOfBirth || "",
+        notes: client.notes || "",
+        status: client.status || "active",
+      });
+    } else if (open && !client) {
+      form.reset({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        dateOfBirth: "",
+        notes: "",
+        status: "active",
+      });
+    }
+  }, [open, client, form]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-responsive-lg">Add New Client</DialogTitle>
+          <DialogTitle className="text-responsive-lg">
+            {client?.id ? "Edit Client" : "Add New Client"}
+          </DialogTitle>
           <DialogDescription>
-            Add a new client to your salon and spa system
+            {client?.id ? "Update client information" : "Add a new client to your salon and spa system"}
           </DialogDescription>
         </DialogHeader>
         

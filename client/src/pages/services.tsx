@@ -1,19 +1,43 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Star, Scissors } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import ServiceModal from "@/components/modals/service-modal";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Service categories will be dynamically generated from database
 
 export default function Services() {
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
+  const [editingService, setEditingService] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { toast } = useToast();
 
   const { data: services, isLoading } = useQuery({
     queryKey: ["/api/services"],
+  });
+
+  const deleteServiceMutation = useMutation({
+    mutationFn: (serviceId: string) => 
+      apiRequest(`/api/services/${serviceId}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/services"] });
+      toast({
+        title: "Success",
+        description: "Service deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete service",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -148,12 +172,40 @@ export default function Services() {
                       <span className="text-sm text-slate-600">4.8 (24 reviews)</span>
                     </div>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setEditingService(service);
+                          setServiceModalOpen(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Service</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{service.name}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteServiceMutation.mutate(service.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              {deleteServiceMutation.isPending ? "Deleting..." : "Delete Service"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardContent>
@@ -166,7 +218,11 @@ export default function Services() {
 
       <ServiceModal 
         open={serviceModalOpen} 
-        onOpenChange={setServiceModalOpen} 
+        onOpenChange={(open) => {
+          setServiceModalOpen(open);
+          if (!open) setEditingService(null);
+        }}
+        service={editingService}
       />
     </>
   );

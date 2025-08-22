@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,9 +53,10 @@ const appointmentFormSchema = insertAppointmentSchema.extend({
 interface AppointmentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  appointment?: any; // For editing existing appointments
 }
 
-export default function AppointmentModal({ open, onOpenChange }: AppointmentModalProps) {
+export default function AppointmentModal({ open, onOpenChange, appointment }: AppointmentModalProps) {
   const { toast } = useToast();
 
   const { data: clients = [] } = useQuery({
@@ -73,27 +74,34 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
   const form = useForm<z.infer<typeof appointmentFormSchema>>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
-      clientId: "",
-      serviceId: "",
-      staffId: "",
-      date: "",
-      time: "",
-      status: "confirmed",
-      notes: "",
+      clientId: appointment?.clientId || "",
+      serviceId: appointment?.serviceId || "",
+      staffId: appointment?.staffId || "",
+      date: appointment?.date || "",
+      time: appointment?.time || "",
+      status: appointment?.status || "confirmed",
+      notes: appointment?.notes || "",
     },
   });
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof appointmentFormSchema>) => {
-      const response = await apiRequest("/api/appointments", "POST", data);
-      return response;
+      if (appointment?.id) {
+        // Update existing appointment
+        const response = await apiRequest(`/api/appointments/${appointment.id}`, "PUT", data);
+        return response;
+      } else {
+        // Create new appointment
+        const response = await apiRequest("/api/appointments", "POST", data);
+        return response;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Success",
-        description: "Appointment created successfully",
+        description: appointment?.id ? "Appointment updated successfully" : "Appointment created successfully",
       });
       onOpenChange(false);
       form.reset();
@@ -101,11 +109,36 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create appointment",
+        description: error.message || (appointment?.id ? "Failed to update appointment" : "Failed to create appointment"),
         variant: "destructive",
       });
     },
   });
+
+  // Reset form when modal opens/closes or appointment changes
+  useEffect(() => {
+    if (open && appointment) {
+      form.reset({
+        clientId: appointment.clientId || "",
+        serviceId: appointment.serviceId || "",
+        staffId: appointment.staffId || "",
+        date: appointment.date || "",
+        time: appointment.time || "",
+        status: appointment.status || "confirmed",
+        notes: appointment.notes || "",
+      });
+    } else if (open && !appointment) {
+      form.reset({
+        clientId: "",
+        serviceId: "",
+        staffId: "",
+        date: "",
+        time: "",
+        status: "confirmed",
+        notes: "",
+      });
+    }
+  }, [open, appointment, form]);
 
   const onSubmit = (data: z.infer<typeof appointmentFormSchema>) => {
     // Find selected service to get price and duration
@@ -139,9 +172,11 @@ export default function AppointmentModal({ open, onOpenChange }: AppointmentModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto spa-modal-shadow">
         <DialogHeader>
-          <DialogTitle className="text-responsive-lg">New Appointment</DialogTitle>
+          <DialogTitle className="text-responsive-lg">
+            {appointment?.id ? "Edit Appointment" : "New Appointment"}
+          </DialogTitle>
           <DialogDescription>
-            Create a new appointment for your client
+            {appointment?.id ? "Update the appointment details" : "Create a new appointment for your client"}
           </DialogDescription>
         </DialogHeader>
         

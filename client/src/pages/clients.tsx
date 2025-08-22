@@ -5,17 +5,46 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, UserPlus, Users, Calendar } from "lucide-react";
+import { Search, UserPlus, Users, Calendar, Edit, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import ClientModal from "@/components/modals/client-modal";
+import AppointmentModal from "@/components/modals/appointment-modal";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Clients() {
   const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [editingClient, setEditingClient] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { toast } = useToast();
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["/api/clients"],
+  });
+
+  const deleteClientMutation = useMutation({
+    mutationFn: (clientId: string) => 
+      apiRequest(`/api/clients/${clientId}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Success",
+        description: "Client deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete client",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -156,12 +185,52 @@ export default function Clients() {
                   </div>
                   
                   <div className="mt-4 flex space-x-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      View Profile
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => {
+                        setEditingClient(client);
+                        setClientModalOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
                     </Button>
-                    <Button size="sm" className="bg-secondary hover:bg-secondary/90">
+                    <Button 
+                      size="sm" 
+                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => {
+                        setSelectedClient(client);
+                        setAppointmentModalOpen(true);
+                      }}
+                    >
                       <Calendar className="h-4 w-4" />
                     </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Client</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete {client.name}? This will also remove all their appointments and history. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => deleteClientMutation.mutate(client.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            {deleteClientMutation.isPending ? "Deleting..." : "Delete Client"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>
@@ -173,7 +242,20 @@ export default function Clients() {
 
       <ClientModal 
         open={clientModalOpen} 
-        onOpenChange={setClientModalOpen} 
+        onOpenChange={(open) => {
+          setClientModalOpen(open);
+          if (!open) setEditingClient(null);
+        }}
+        client={editingClient}
+      />
+      
+      <AppointmentModal 
+        open={appointmentModalOpen} 
+        onOpenChange={(open) => {
+          setAppointmentModalOpen(open);
+          if (!open) setSelectedClient(null);
+        }}
+        appointment={selectedClient ? { clientId: selectedClient.id } : null}
       />
     </>
   );

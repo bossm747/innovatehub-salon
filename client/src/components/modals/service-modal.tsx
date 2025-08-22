@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertServiceSchema } from "@shared/schema";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,20 +44,21 @@ const categories = [
 interface ServiceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  service?: any; // For editing existing service
 }
 
-export default function ServiceModal({ open, onOpenChange }: ServiceModalProps) {
+export default function ServiceModal({ open, onOpenChange, service }: ServiceModalProps) {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof insertServiceSchema>>({
     resolver: zodResolver(insertServiceSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      category: "",
-      duration: 60,
-      price: "0",
-      isActive: true,
+      name: service?.name || "",
+      description: service?.description || "",
+      category: service?.category || "",
+      duration: service?.duration || 60,
+      price: service?.price || "0",
+      isActive: service?.isActive ?? true,
     },
   });
 
