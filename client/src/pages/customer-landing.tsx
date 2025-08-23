@@ -55,33 +55,38 @@ export default function CustomerLanding({ onLoginClick, onRegisterClick }: Custo
       ></div>
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Hero Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/hero-background.jpeg)' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/30 to-pink-900/40"></div>
+        
         {/* Enhanced Stunning Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-600 to-indigo-600">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-pink-900/20"></div>
-          {/* Enhanced Animated Elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-80 animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 rounded-full mix-blend-multiply filter blur-xl opacity-75 animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '4s' }}></div>
-            <div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-65 animate-pulse" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-gradient-to-r from-teal-400 via-emerald-500 to-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute top-1/3 right-1/5 w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '5s' }}></div>
-          </div>
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 rounded-full mix-blend-multiply filter blur-xl opacity-55 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-45 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-gradient-to-r from-teal-400 via-emerald-500 to-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-pulse" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/3 right-1/5 w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse" style={{ animationDelay: '5s' }}></div>
         </div>
 
         <div className="relative z-10 container mx-auto px-6 py-12 text-center">
           <div className="max-w-4xl mx-auto">
             
             {/* Brand */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
-                <Sparkles className="h-12 w-12 text-white" />
-              </div>
-              <div className="text-white">
-                <h1 className="text-5xl lg:text-7xl font-bold tracking-tight uppercase">
+            <div className="flex flex-col items-center justify-center mb-8">
+              <img
+                src="/justpause-logo.png"
+                alt="JustPause Salon & Spa"
+                className="h-32 lg:h-40 w-auto mb-6 drop-shadow-2xl"
+              />
+              <div className="text-white text-center">
+                <h1 className="text-4xl lg:text-6xl font-bold tracking-tight uppercase mb-2">
                   JustPause
                 </h1>
-                <p className="text-xl text-purple-100 font-medium uppercase tracking-wider">
+                <p className="text-lg text-purple-100 font-medium uppercase tracking-wider">
                   Salon & Spa
                 </p>
               </div>
