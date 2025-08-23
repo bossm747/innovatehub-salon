@@ -83,12 +83,14 @@ export default function CustomerLanding({ onLoginClick, onRegisterClick }: Custo
                 className="h-32 lg:h-40 w-auto mb-6 drop-shadow-2xl"
               />
               <div className="text-white text-center">
-                <h1 className="text-4xl lg:text-6xl font-bold tracking-tight uppercase mb-2">
-                  JustPause
+                <h1 
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-rose-300 via-purple-300 to-pink-300 bg-clip-text text-transparent font-bold leading-tight drop-shadow-lg mb-2"
+                  style={{
+                    fontFamily: "'Great Vibes', 'Dancing Script', cursive",
+                  }}
+                >
+                  JustPause Salon & Spa
                 </h1>
-                <p className="text-lg text-purple-100 font-medium uppercase tracking-wider">
-                  Salon & Spa
-                </p>
               </div>
             </div>
 
