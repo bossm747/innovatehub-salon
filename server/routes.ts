@@ -1233,6 +1233,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer Portal Routes (Public API)
+  app.get('/api/customer/services', async (req, res) => {
+    try {
+      const services = await storage.getServices();
+      const activeServices = services.filter(service => service.isActive);
+      res.json(activeServices);
+    } catch (error) {
+      console.error('Error fetching services for customer portal:', error);
+      res.status(500).json({ message: 'Failed to fetch services' });
+    }
+  });
+
+  app.get('/api/customer/staff', async (req, res) => {
+    try {
+      const staff = await storage.getAllStaff();
+      const activeStaff = staff.filter(member => member.isActive);
+      res.json(activeStaff);
+    } catch (error) {
+      console.error('Error fetching staff for customer portal:', error);
+      res.status(500).json({ message: 'Failed to fetch staff' });
+    }
+  });
+
+  app.post('/api/customer/book', async (req, res) => {
+    try {
+      const { clientId, serviceId, staffId, date, time, customerNotes } = req.body;
+      
+      // Get service details for pricing
+      const service = await storage.getService(serviceId);
+      if (!service) {
+        return res.status(404).json({ message: 'Service not found' });
+      }
+
+      const appointment = await storage.createAppointment({
+        clientId,
+        serviceId,
+        staffId,
+        date,
+        time,
+        duration: service.duration,
+        status: 'confirmed',
+        totalAmount: service.price,
+        bookingSource: 'online',
+        customerNotes,
+      });
+
+      res.json(appointment);
+    } catch (error) {
+      console.error('Error creating customer booking:', error);
+      res.status(500).json({ message: 'Failed to create booking' });
+    }
+  });
+
+  app.post('/api/customer/register', async (req, res) => {
+    try {
+      const { name, email, phone, address, dateOfBirth, portalPin } = req.body;
+      
+      const client = await storage.createClient({
+        name,
+        email,
+        phone,
+        address,
+        dateOfBirth,
+        customerPortalEnabled: true,
+        portalPin,
+      });
+
+      res.json(client);
+    } catch (error) {
+      console.error('Error registering customer:', error);
+      res.status(500).json({ message: 'Failed to register customer' });
+    }
+  });
+
+  app.post('/api/customer/login', async (req, res) => {
+    try {
+      const { phone, portalPin } = req.body;
+      
+      const clients = await storage.getClients();
+      const client = clients.find(c => c.phone === phone && c.portalPin === portalPin);
+      
+      if (!client) {
+        return res.status(401).json({ message: 'Invalid phone number or PIN' });
+      }
+
+      res.json(client);
+    } catch (error) {
+      console.error('Error logging in customer:', error);
+      res.status(500).json({ message: 'Failed to login' });
+    }
+  });
+
+  app.get('/api/customer/:clientId/appointments', async (req, res) => {
+    try {
+      const { clientId } = req.params;
+      const appointments = await storage.getAppointments();
+      const clientAppointments = appointments.filter(apt => apt.clientId === clientId);
+      res.json(clientAppointments);
+    } catch (error) {
+      console.error('Error fetching customer appointments:', error);
+      res.status(500).json({ message: 'Failed to fetch appointments' });
+    }
+  });
+
+  // Walk-in Registration Route (Staff Interface)
+  app.post('/api/walk-in/register', async (req, res) => {
+    try {
+      const { name, phone, email, serviceId, staffId, notes } = req.body;
+      
+      // Check if customer already exists
+      const clients = await storage.getClients();
+      let client = clients.find(c => c.phone === phone);
+      
+      if (!client) {
+        // Create new walk-in customer
+        client = await storage.createClient({
+          name,
+          phone,
+          email: email || `${phone}@walkin.local`,
+          customerPortalEnabled: false,
+        });
+      }
+
+      // Get service details
+      const service = await storage.getService(serviceId);
+      if (!service) {
+        return res.status(404).json({ message: 'Service not found' });
+      }
+
+      // Create appointment
+      const now = new Date();
+      const appointment = await storage.createAppointment({
+        clientId: client.id,
+        serviceId,
+        staffId,
+        date: now.toISOString().split('T')[0],
+        time: now.toTimeString().split(' ')[0].substring(0, 5),
+        duration: service.duration,
+        status: 'confirmed',
+        totalAmount: service.price,
+        bookingSource: 'walk-in',
+        notes,
+      });
+
+      res.json({ client, appointment });
+    } catch (error) {
+      console.error('Error registering walk-in customer:', error);
+      res.status(500).json({ message: 'Failed to register walk-in customer' });
+    }
+  });
+
+  app.get('/api/walk-in/quick-search', async (req, res) => {
+    try {
+      const { query } = req.query;
+      const clients = await storage.getClients();
+      
+      const filteredClients = clients.filter(client => 
+        client.name.toLowerCase().includes((query as string).toLowerCase()) ||
+        client.phone?.includes(query as string) ||
+        client.email.toLowerCase().includes((query as string).toLowerCase())
+      ).slice(0, 10); // Limit to 10 results
+      
+      res.json(filteredClients);
+    } catch (error) {
+      console.error('Error searching clients:', error);
+      res.status(500).json({ message: 'Failed to search clients' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

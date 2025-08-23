@@ -16,6 +16,10 @@ export const clients = pgTable("clients", {
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   lastVisit: timestamp("last_visit"),
   status: text("status").default("active"), // active, inactive
+  // Customer Portal Fields
+  customerPortalEnabled: boolean("customer_portal_enabled").default(false),
+  preferredStaffId: varchar("preferred_staff_id").references(() => staff.id),
+  portalPin: text("portal_pin"), // Simple 4-digit PIN for customer portal access
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -53,6 +57,9 @@ export const appointments = pgTable("appointments", {
   status: text("status").default("confirmed"), // confirmed, pending, cancelled, completed
   notes: text("notes"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+  // Customer Portal & Walk-in Tracking
+  bookingSource: text("booking_source").default("walk-in"), // online, walk-in, phone, admin
+  customerNotes: text("customer_notes"), // Notes added by customer during online booking
   createdAt: timestamp("created_at").defaultNow(),
 });
 

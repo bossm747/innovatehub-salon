@@ -13,7 +13,9 @@ import {
   BarChart3,
   Settings, 
   LogOut,
-  X
+  X,
+  UserPlus,
+  Smartphone
 } from "lucide-react";
 import SalonLogo from "@/components/salon-logo";
 
@@ -34,6 +36,11 @@ const navigation = [
   { name: "Marketing", href: "/marketing", icon: Mail },
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
+];
+
+const customerNavigation = [
+  { name: "Walk-in Registration", href: "/walk-in", icon: UserPlus },
+  { name: "Customer Portal", href: "/customer", icon: Smartphone },
 ];
 
 const secondaryNavigation = [
@@ -102,6 +109,37 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </Link>
               );
             })}
+          </div>
+
+          {/* Customer Services Section */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <h3 className="px-3 mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Customer Services
+            </h3>
+            <div className="space-y-2">
+              {customerNavigation.map((item) => {
+                const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
+                return (
+                  <Link key={item.name} href={item.href}>
+                    <span 
+                      className={cn(
+                        "group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer",
+                        isActive 
+                          ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/25" 
+                          : "text-slate-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 hover:text-slate-900 hover:shadow-sm"
+                      )}
+                      onClick={() => onClose()}
+                    >
+                      <item.icon className={cn(
+                        "mr-3 h-5 w-5 transition-colors",
+                        isActive ? "text-white" : "text-slate-400 group-hover:text-pink-600"
+                      )} />
+                      <span className="font-medium">{item.name}</span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
           
           {/* Secondary Navigation */}

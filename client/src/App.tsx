@@ -18,6 +18,8 @@ import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
 import Documentation from "@/pages/documentation";
 import Landing from "@/pages/landing";
+import CustomerPortal from "@/pages/customer-portal";
+import WalkInRegistration from "@/pages/walk-in";
 import Preloader from "@/components/preloader";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
@@ -40,6 +42,8 @@ function Router({ showDocs, setShowDocs }: { showDocs: boolean; setShowDocs: (sh
       <Route path="/marketing" component={Marketing} />
       <Route path="/reports" component={Reports} />
       <Route path="/settings" component={Settings} />
+      <Route path="/customer" component={CustomerPortal} />
+      <Route path="/walk-in" component={WalkInRegistration} />
       <Route component={NotFound} />
     </Switch>
   );
