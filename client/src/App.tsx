@@ -33,7 +33,7 @@ function Router({ showDocs, setShowDocs }: { showDocs: boolean; setShowDocs: (sh
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/appointments" component={Appointments} />
-      <Route path="/clients" component={Clients} />
+      <Route path="/customers" component={Clients} />
       <Route path="/services" component={Services} />
       <Route path="/staff" component={Staff} />
       <Route path="/inventory" component={Inventory} />
