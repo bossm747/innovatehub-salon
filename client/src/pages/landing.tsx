@@ -182,30 +182,6 @@ export default function Landing({ onEnter }: LandingProps) {
               </p>
             </motion.div>
 
-            {/* Key Benefits */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="flex flex-wrap justify-center gap-4 mb-10"
-            >
-              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Philippine Payment Methods
-              </Badge>
-              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                SMS & Email Reminders
-              </Badge>
-              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Mobile Responsive
-              </Badge>
-              <Badge className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Real-time Analytics
-              </Badge>
-            </motion.div>
 
             {/* CTA Buttons */}
             <motion.div
@@ -217,7 +193,7 @@ export default function Landing({ onEnter }: LandingProps) {
               <Button
                 onClick={() => window.location.href = '/customer'}
                 size="lg"
-                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
+                className="px-8 py-4 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
               >
                 <Users className="h-5 w-5 mr-2" />
                 Customer Portal
@@ -225,7 +201,7 @@ export default function Landing({ onEnter }: LandingProps) {
               <Button
                 onClick={onEnter}
                 size="lg"
-                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
+                className="px-8 py-4 text-lg font-semibold bg-purple-600 hover:bg-purple-700 text-white transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
               >
                 <Shield className="h-5 w-5 mr-2" />
                 Staff Portal
