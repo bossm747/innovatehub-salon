@@ -38,6 +38,7 @@ export const staff = pgTable("staff", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  password: text("password").notNull(),
   phone: text("phone"),
   role: text("role").notNull(),
   specialties: text("specialties").array(),

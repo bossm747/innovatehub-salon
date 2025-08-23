@@ -136,6 +136,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Staff authentication routes
+  app.post("/api/staff/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      const staff = await storage.authenticateStaff(email, password);
+      if (!staff) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Store staff in session
+      (req.session as any).staffId = staff.id;
+      
+      res.json({ message: "Login successful", staff: { id: staff.id, name: staff.name, email: staff.email, role: staff.role } });
+    } catch (error) {
+      console.error("Staff login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.get("/api/staff/me", async (req, res) => {
+    try {
+      const staffId = (req.session as any).staffId;
+      
+      if (!staffId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const staff = await storage.getStaff(staffId);
+      if (!staff) {
+        return res.status(401).json({ message: "Staff not found" });
+      }
+
+      res.json({ id: staff.id, name: staff.name, email: staff.email, role: staff.role });
+    } catch (error) {
+      console.error("Get staff me error:", error);
+      res.status(500).json({ message: "Failed to get staff info" });
+    }
+  });
+
+  app.post("/api/staff/logout", async (req, res) => {
+    try {
+      delete (req.session as any).staffId;
+      res.json({ message: "Logout successful" });
+    } catch (error) {
+      console.error("Staff logout error:", error);
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
   // Staff routes
   app.get("/api/staff", async (req, res) => {
     try {

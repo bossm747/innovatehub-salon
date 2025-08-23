@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, lt, sql, desc, and } from "drizzle-orm";
+import { eq, lt, sql, desc, and, or } from "drizzle-orm";
 import {
   customers,
   services,
@@ -76,6 +76,7 @@ export interface IStorage {
   createStaff(staff: InsertStaff): Promise<Staff>;
   updateStaff(id: string, staff: Partial<InsertStaff>): Promise<Staff | undefined>;
   deleteStaff(id: string): Promise<boolean>;
+  authenticateStaff(email: string, password: string): Promise<Staff | null>;
 
   // Appointments
   getAppointment(id: string): Promise<Appointment | undefined>;
@@ -261,6 +262,20 @@ export class DatabaseStorage implements IStorage {
   async deleteStaff(id: string): Promise<boolean> {
     const result = await db.delete(staff).where(eq(staff.id, id));
     return (result.rowCount ?? 0) > 0;
+  }
+
+  async authenticateStaff(email: string, password: string): Promise<Staff | null> {
+    try {
+      const [staffMember] = await db
+        .select()
+        .from(staff)
+        .where(and(eq(staff.email, email), eq(staff.password, password), eq(staff.isActive, true)));
+      
+      return staffMember || null;
+    } catch (error) {
+      console.error("Staff authentication error:", error);
+      return null;
+    }
   }
 
   // Appointment methods

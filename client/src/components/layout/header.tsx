@@ -1,8 +1,15 @@
-import { Search, Bell, Menu, Book } from "lucide-react";
+import { Search, Bell, Menu, Book, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SalonLogo from "@/components/salon-logo";
+import { useStaffAuth, useStaffLogout } from "@/hooks/useStaffAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -10,6 +17,18 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
+  const { staff } = useStaffAuth();
+  const staffLogout = useStaffLogout();
+
+  const handleLogout = async () => {
+    try {
+      await staffLogout.mutateAsync();
+      window.location.reload();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <>
       <div className="admin-header shadow-sm bg-white/95 backdrop-blur-sm">
@@ -58,16 +77,28 @@ export default function Header({ onMenuClick, onDocsClick }: HeaderProps) {
                 <span className="absolute top-1 right-1 block h-2 w-2 bg-red-500 rounded-full"></span>
               </Button>
               
-              <div className="flex items-center space-x-3">
-                <div className="hidden sm:block text-right">
-                  <div className="text-sm font-medium text-slate-900">Sarah Johnson</div>
-                  <div className="text-xs text-slate-500">Manager</div>
-                </div>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" />
-                  <AvatarFallback>SJ</AvatarFallback>
-                </Avatar>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors">
+                    <div className="hidden sm:block text-right">
+                      <div className="text-sm font-medium text-slate-900">{staff?.name || "Staff Member"}</div>
+                      <div className="text-xs text-slate-500">{staff?.role || "Staff"}</div>
+                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" />
+                      <AvatarFallback>
+                        {staff?.name ? staff.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ST'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
