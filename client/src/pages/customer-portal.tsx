@@ -10,6 +10,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Calendar, Clock, Phone, User, Shield } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import BookingCalendar from "@/components/booking-calendar";
+import CustomerAppointments from "@/components/customer-appointments";
 
 interface Service {
   id: string;
@@ -394,57 +396,20 @@ export default function CustomerPortal() {
           </TabsList>
 
           <TabsContent value="book" className="space-y-6">
-            <h2 className="text-xl font-semibold">Available Services</h2>
-            <div className="grid gap-6">
-              {Object.entries(groupServicesByCategory(services)).map(([category, categoryServices]) => (
-                <Card key={category} className="border-0 shadow-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold capitalize text-pink-600 dark:text-pink-400">
-                      {category.replace('-', ' ')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {categoryServices.map((service) => (
-                        <div key={service.id} className="p-4 border rounded-lg bg-white/50 dark:bg-gray-700/50">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-medium">{service.name}</h3>
-                            <Badge className="bg-pink-100 text-pink-800 dark:bg-pink-800 dark:text-pink-100">
-                              ₱{service.price}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{service.description}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-500 flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {service.duration} mins
-                            </span>
-                            <Button 
-                              size="sm" 
-                              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                              data-testid={`button-book-${service.id}`}
-                            >
-                              Book Now
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <h2 className="text-xl font-semibold">Book an Appointment</h2>
+            <BookingCalendar 
+              customerId={currentCustomer.id}
+              onBookingComplete={(booking) => {
+                // Refresh appointments list and switch to appointments tab
+                queryClient.invalidateQueries({ queryKey: ['/api/customer', currentCustomer.id, 'appointments'] });
+                setActiveTab("appointments");
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="appointments" className="space-y-6">
             <h2 className="text-xl font-semibold">My Appointments</h2>
-            <Card className="border-0 shadow-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <p className="text-center text-gray-500 py-8">
-                  No appointments found. Book your first service to get started!
-                </p>
-              </CardContent>
-            </Card>
+            <CustomerAppointments customerId={currentCustomer.id} />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">

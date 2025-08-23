@@ -8,12 +8,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AppointmentModal from "@/components/modals/appointment-modal";
+import BookingCalendar from "@/components/booking-calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Appointments() {
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("calendar");
   const { toast } = useToast();
 
   const { data: appointments, isLoading } = useQuery({

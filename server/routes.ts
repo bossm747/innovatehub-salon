@@ -1402,6 +1402,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Booking Availability API
+  app.get('/api/booking/availability', async (req, res) => {
+    try {
+      const { date, serviceId, staffId } = req.query;
+      
+      if (!date || !serviceId) {
+        return res.status(400).json({ message: 'Date and service ID are required' });
+      }
+
+      // Get service duration
+      const service = await storage.getService(serviceId as string);
+      if (!service) {
+        return res.status(404).json({ message: 'Service not found' });
+      }
+
+      // Get all appointments for the date
+      const appointments = await storage.getAppointments();
+      const dayAppointments = appointments.filter(apt => apt.date === date);
+
+      // Generate time slots (9 AM to 6 PM, 30-minute intervals)
+      const generateTimeSlots = (): string[] => {
+        const slots = [];
+        for (let hour = 9; hour < 18; hour++) {
+          slots.push(`${hour.toString().padStart(2, '0')}:00`);
+          slots.push(`${hour.toString().padStart(2, '0')}:30`);
+        }
+        return slots;
+      };
+
+      // Check availability for each time slot
+      const timeSlots = generateTimeSlots().map(time => {
+        // Check if this time slot conflicts with existing appointments
+        const conflicts = dayAppointments.filter(apt => {
+          const aptStart = parseInt(apt.time.replace(':', ''));
+          const aptEnd = aptStart + Math.floor(apt.duration / 60) * 100 + (apt.duration % 60);
+          const slotStart = parseInt(time.replace(':', ''));
+          const slotEnd = slotStart + Math.floor(service.duration / 60) * 100 + (service.duration % 60);
+          
+          // Check if there's any overlap
+          return (slotStart < aptEnd && slotEnd > aptStart) && 
+                 (!staffId || apt.staffId === staffId);
+        });
+
+        const conflictingAppointment = conflicts[0];
+        
+        return {
+          time,
+          available: conflicts.length === 0,
+          staffId: conflictingAppointment?.staffId,
+          staffName: conflictingAppointment ? 'Booked' : undefined
+        };
+      });
+
+      res.json(timeSlots);
+    } catch (error) {
+      console.error('Error fetching availability:', error);
+      res.status(500).json({ message: 'Failed to fetch availability' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
