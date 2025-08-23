@@ -62,7 +62,8 @@ function App() {
   const [showDocs, setShowDocs] = useState(false);
   const [appState, setAppState] = useState<'loading' | 'landing' | 'app'>('loading');
 
-  // Always show preloader and landing page on every load
+  // Check if we're accessing customer portal directly
+  const isCustomerRoute = window.location.pathname.startsWith('/customer');
 
   const handlePreloaderComplete = () => {
     setAppState('landing');
@@ -72,6 +73,18 @@ function App() {
     localStorage.setItem('serenity-spa-visited', 'true');
     setAppState('app');
   };
+
+  // Skip preloader/landing for customer routes
+  if (isCustomerRoute) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <CustomerRouter />
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
 
   if (appState === 'loading') {
     return <Preloader onComplete={handlePreloaderComplete} />;
@@ -84,7 +97,7 @@ function App() {
           <Landing onEnter={handleEnterApp} />
         ) : (
           <Switch>
-            {/* Customer Portal Routes */}
+            {/* Customer Portal Routes - shouldn't reach here due to direct handling above */}
             <Route path="/customer/*:rest?">
               <CustomerRouter />
             </Route>
