@@ -23,6 +23,7 @@ import {
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import CustomerLayout from "@/components/layout/customer-layout";
+import { useCustomerLogout } from "@/hooks/useCustomerAuth";
 
 interface CustomerDashboardProps {
   customer: any;
@@ -31,6 +32,15 @@ interface CustomerDashboardProps {
 
 export default function CustomerDashboard({ customer, onLogout }: CustomerDashboardProps) {
   const [, navigate] = useLocation();
+  const logoutMutation = useCustomerLogout();
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        onLogout();
+      }
+    });
+  };
 
   // Get customer's appointments
   const { data: appointments = [], refetch: refetchAppointments } = useQuery({
@@ -74,7 +84,7 @@ export default function CustomerDashboard({ customer, onLogout }: CustomerDashbo
   };
 
   return (
-    <CustomerLayout customer={customer} onLogout={onLogout}>
+    <CustomerLayout customer={customer} onLogout={handleLogout}>
       <div className="space-y-6">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

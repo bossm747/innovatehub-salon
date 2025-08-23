@@ -1487,13 +1487,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { phone, pin } = req.body;
       
-      // Find customer by phone
+      // Find customer by phone and PIN
       const customers = await storage.getCustomers();
       const customer = customers.find(c => c.phone === phone && c.portalPin === pin);
       
       if (!customer) {
         return res.status(401).json({ message: 'Invalid phone number or PIN' });
       }
+      
+      // Store customer in session
+      (req as any).session.customerId = customer.id;
+      (req as any).session.customerData = customer;
       
       res.json(customer);
     } catch (error) {
@@ -1505,6 +1509,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/customer/register', async (req, res) => {
     try {
       const { name, phone, email, portalPin } = req.body;
+      
+      // Validate PIN is 4 digits
+      if (!portalPin || portalPin.length !== 4 || !/^\d{4}$/.test(portalPin)) {
+        return res.status(400).json({ message: 'PIN must be exactly 4 digits' });
+      }
       
       // Check if customer already exists
       const customers = await storage.getCustomers();
@@ -1519,8 +1528,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone,
         email,
         portalPin,
+        customerPortalEnabled: true,
         notes: 'Registered via customer portal'
       });
+      
+      // Automatically log in the new customer
+      (req as any).session.customerId = newCustomer.id;
+      (req as any).session.customerData = newCustomer;
       
       res.json(newCustomer);
     } catch (error) {
@@ -1529,9 +1543,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/customer/:id/appointments', async (req, res) => {
+  // Customer Authentication Middleware
+  const isCustomerAuthenticated = (req: any, res: any, next: any) => {
+    if (!req.session.customerId) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    next();
+  };
+
+  // Get current customer data
+  app.get('/api/customer/me', isCustomerAuthenticated, async (req, res) => {
+    try {
+      const customerId = (req as any).session.customerId;
+      const customer = await storage.getCustomer(customerId);
+      
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+      
+      res.json(customer);
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+      res.status(500).json({ message: 'Failed to fetch customer data' });
+    }
+  });
+
+  // Customer logout
+  app.post('/api/customer/logout', (req, res) => {
+    (req as any).session.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+
+  app.get('/api/customer/:id/appointments', isCustomerAuthenticated, async (req, res) => {
     try {
       const customerId = req.params.id;
+      const sessionCustomerId = (req as any).session.customerId;
+      
+      // Ensure customer can only access their own appointments
+      if (customerId !== sessionCustomerId) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
       const appointments = await storage.getAppointments();
       const customerAppointments = appointments.filter(apt => apt.customerId === customerId);
       res.json(customerAppointments);
@@ -1541,13 +1597,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/customer/book', async (req, res) => {
+  app.post('/api/customer/book', isCustomerAuthenticated, async (req, res) => {
     try {
-      const { customerId, serviceId, staffId, date, time, customerNotes } = req.body;
+      const { serviceId, staffId, date, time, customerNotes } = req.body;
+      const customerId = (req as any).session.customerId;
       
-      // Get service details for pricing
-      const services = await storage.getServices();
-      const service = services.find(s => s.id === serviceId);
+      // Get service details for pricing and duration
+      const service = await storage.getService(serviceId);
       
       if (!service) {
         return res.status(400).json({ message: 'Service not found' });
@@ -1559,8 +1615,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         staffId,
         date,
         time,
+        duration: service.duration,
         status: 'confirmed',
         totalAmount: service.price,
+        bookingSource: 'online',
         customerNotes: customerNotes || '',
         notes: customerNotes || ''
       });

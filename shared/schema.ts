@@ -17,9 +17,9 @@ export const customers = pgTable("customers", {
   lastVisit: timestamp("last_visit"),
   status: text("status").default("active"), // active, inactive
   // Customer Portal Fields
-  customerPortalEnabled: boolean("customer_portal_enabled").default(false),
+  customerPortalEnabled: boolean("customer_portal_enabled").default(true),
   preferredStaffId: varchar("preferred_staff_id").references(() => staff.id),
-  portalPin: text("portal_pin"), // Simple 4-digit PIN for customer portal access
+  portalPin: text("portal_pin").notNull(), // Simple 4-digit PIN for customer portal access
   createdAt: timestamp("created_at").defaultNow(),
 });
 

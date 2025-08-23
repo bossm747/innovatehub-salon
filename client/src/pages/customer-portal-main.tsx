@@ -4,40 +4,32 @@ import CustomerLanding from "./customer-landing";
 import CustomerAuth from "./customer-auth";
 import CustomerDashboard from "./customer-dashboard";
 import CustomerBooking from "./customer-booking";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 
 export default function CustomerPortalMain() {
-  const [customer, setCustomer] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'landing' | 'login' | 'register' | 'dashboard'>('landing');
   const [, navigate] = useLocation();
+  const { customer, isLoading, isAuthenticated } = useCustomerAuth();
 
-  // Check if customer is already logged in (from localStorage)
+  // Update view based on authentication status
   useEffect(() => {
-    const savedCustomer = localStorage.getItem('customer-session');
-    if (savedCustomer) {
-      try {
-        const customerData = JSON.parse(savedCustomer);
-        setCustomer(customerData);
+    if (!isLoading) {
+      if (isAuthenticated && customer) {
         setCurrentView('dashboard');
-      } catch (error) {
-        // Clear invalid session data
-        localStorage.removeItem('customer-session');
+      } else {
+        setCurrentView('landing');
       }
     }
-    setIsLoading(false);
-  }, []);
+  }, [isLoading, isAuthenticated, customer]);
 
   const handleCustomerLogin = (customerData: any) => {
-    setCustomer(customerData);
+    // Authentication is managed by the hook, just update view
     setCurrentView('dashboard');
-    // Save to localStorage for persistence
-    localStorage.setItem('customer-session', JSON.stringify(customerData));
   };
 
   const handleCustomerLogout = () => {
-    setCustomer(null);
+    // Logout is handled by the hook, just update view
     setCurrentView('landing');
-    localStorage.removeItem('customer-session');
   };
 
   const handleLoginClick = () => {
