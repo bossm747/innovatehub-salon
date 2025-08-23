@@ -60,6 +60,9 @@ export const appointments = pgTable("appointments", {
   // Customer Portal & Walk-in Tracking
   bookingSource: text("booking_source").default("walk-in"), // online, walk-in, phone, admin
   customerNotes: text("customer_notes"), // Notes added by customer during online booking
+  waitingListPosition: integer("waiting_list_position"), // Position in waiting list for walk-ins
+  signatureUrl: text("signature_url"), // Digital signature for walk-in customers
+  checkedInAt: timestamp("checked_in_at"), // When walk-in customer checked in
   createdAt: timestamp("created_at").defaultNow(),
 });
 

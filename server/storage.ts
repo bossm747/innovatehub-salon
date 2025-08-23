@@ -84,6 +84,10 @@ export interface IStorage {
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined>;
   deleteAppointment(id: string): Promise<boolean>;
+  
+  // Walk-in Management
+  getWalkInWaitingList(): Promise<any[]>;
+  searchCustomersQuick(query: string): Promise<Customer[]>;
 
   // Products
   getProduct(id: string): Promise<Product | undefined>;
@@ -327,6 +331,58 @@ export class DatabaseStorage implements IStorage {
   async deleteAppointment(id: string): Promise<boolean> {
     const result = await db.delete(appointments).where(eq(appointments.id, id));
     return (result.rowCount ?? 0) > 0;
+  }
+
+  // Walk-in Management
+  async getWalkInWaitingList(): Promise<any[]> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const waitingList = await db
+        .select({
+          id: appointments.id,
+          name: customers.name,
+          serviceName: services.name,
+          phone: customers.phone,
+        })
+        .from(appointments)
+        .innerJoin(customers, eq(appointments.customerId, customers.id))
+        .innerJoin(services, eq(appointments.serviceId, services.id))
+        .where(
+          and(
+            eq(appointments.date, today),
+            eq(appointments.bookingSource, "walk-in"),
+            eq(appointments.status, "confirmed")
+          )
+        )
+        .orderBy(appointments.createdAt);
+      
+      return waitingList;
+    } catch (error) {
+      console.error("Get waiting list error:", error);
+      return [];
+    }
+  }
+
+  async searchCustomersQuick(query: string): Promise<Customer[]> {
+    try {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const results = await db
+        .select()
+        .from(customers)
+        .where(
+          or(
+            sql`LOWER(${customers.name}) LIKE ${searchTerm}`,
+            sql`${customers.phone} LIKE ${searchTerm}`,
+            sql`LOWER(${customers.email}) LIKE ${searchTerm}`
+          )
+        )
+        .limit(10);
+      
+      return results;
+    } catch (error) {
+      console.error("Quick search error:", error);
+      return [];
+    }
   }
 
   // Product methods

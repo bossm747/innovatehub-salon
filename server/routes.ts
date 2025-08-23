@@ -1338,22 +1338,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Walk-in Registration Route (Staff Interface)
+  // Walk-in Registration endpoints
+  app.get("/api/walk-in/waiting-list", async (req, res) => {
+    try {
+      const waitingList = await storage.getWalkInWaitingList();
+      res.json(waitingList);
+    } catch (error) {
+      console.error('Get Waiting List Error:', error);
+      res.status(500).json({ message: "Failed to fetch waiting list" });
+    }
+  });
+
+  app.get("/api/walk-in/quick-search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query || query.length < 2) {
+        return res.json([]);
+      }
+      
+      const customers = await storage.searchCustomersQuick(query);
+      res.json(customers);
+    } catch (error) {
+      console.error('Quick Search Error:', error);
+      res.status(500).json({ message: "Failed to search customers" });
+    }
+  });
+
   app.post('/api/walk-in/register', async (req, res) => {
     try {
-      const { name, phone, email, serviceId, staffId, notes } = req.body;
-      
-      // Check if customer already exists
-      const clients = await storage.getCustomers();
-      let client = clients.find(c => c.phone === phone);
-      
-      if (!client) {
-        // Create new walk-in customer
-        client = await storage.createCustomer({
-          name,
-          phone,
-          email: email || `${phone}@walkin.local`,
-          customerPortalEnabled: false,
-        });
+      const {
+        customerId,
+        name,
+        phone,
+        email,
+        serviceId,
+        staffId,
+        notes,
+        signature,
+        isExistingCustomer
+      } = req.body;
+
+      let client;
+      if (isExistingCustomer && customerId) {
+        // Use existing customer
+        client = await storage.getCustomer(customerId);
+        if (!client) {
+          return res.status(400).json({ message: "Customer not found" });
+        }
+      } else {
+        // Check if customer already exists by phone
+        const clients = await storage.getCustomers();
+        client = clients.find(c => c.phone === phone);
+        
+        if (!client) {
+          // Create new walk-in customer
+          client = await storage.createCustomer({
+            name,
+            phone,
+            email: email || `${phone}@walkin.local`,
+            customerPortalEnabled: false,
+          });
+        }
       }
 
       // Get service details
@@ -1361,6 +1406,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!service) {
         return res.status(404).json({ message: 'Service not found' });
       }
+
+      // Get next waiting list position
+      const waitingList = await storage.getWalkInWaitingList();
+      const waitingListPosition = waitingList.length + 1;
 
       // Create appointment
       const now = new Date();
@@ -1375,32 +1424,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalAmount: service.price,
         bookingSource: 'walk-in',
         notes,
+        waitingListPosition,
+        signatureUrl: signature || null,
+        checkedInAt: new Date(),
       });
 
-      res.json({ client, appointment });
+      res.json({ 
+        client, 
+        appointment, 
+        waitingListPosition,
+        message: "Walk-in registration successful"
+      });
     } catch (error) {
       console.error('Error registering walk-in customer:', error);
       res.status(500).json({ message: 'Failed to register walk-in customer' });
     }
   });
 
-  app.get('/api/walk-in/quick-search', async (req, res) => {
-    try {
-      const { query } = req.query;
-      const clients = await storage.getCustomers();
-      
-      const filteredClients = clients.filter(client => 
-        client.name.toLowerCase().includes((query as string).toLowerCase()) ||
-        client.phone?.includes(query as string) ||
-        client.email.toLowerCase().includes((query as string).toLowerCase())
-      ).slice(0, 10); // Limit to 10 results
-      
-      res.json(filteredClients);
-    } catch (error) {
-      console.error('Error searching clients:', error);
-      res.status(500).json({ message: 'Failed to search clients' });
-    }
-  });
+  // Customer Portal authentication endpoints
 
   // Booking Availability API
   app.get('/api/booking/availability', async (req, res) => {
