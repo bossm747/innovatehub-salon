@@ -149,24 +149,15 @@ export default function CustomerLanding({ onLoginClick, onRegisterClick }: Custo
               </div>
             </div>
 
-            {/* Main CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            {/* Main CTA */}
+            <div className="flex justify-center items-center mb-12">
               <Button 
                 size="lg"
-                className="bg-white text-purple-600 hover:bg-purple-50 font-semibold px-8 py-4 text-lg"
+                className="bg-white text-purple-600 hover:bg-purple-50 font-semibold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
                 onClick={onRegisterClick}
               >
                 <Calendar className="mr-2 h-6 w-6" />
                 Book Appointment Now
-              </Button>
-              <Button 
-                variant="outline"
-                size="lg"
-                className="border-2 border-white text-white hover:bg-white/10 font-semibold px-8 py-4 text-lg"
-                onClick={onLoginClick}
-              >
-                <LogIn className="mr-2 h-6 w-6" />
-                Customer Login
               </Button>
             </div>
 
