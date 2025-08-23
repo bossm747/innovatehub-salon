@@ -1343,12 +1343,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, phone, email, serviceId, staffId, notes } = req.body;
       
       // Check if customer already exists
-      const clients = await storage.getClients();
+      const clients = await storage.getCustomers();
       let client = clients.find(c => c.phone === phone);
       
       if (!client) {
         // Create new walk-in customer
-        client = await storage.createClient({
+        client = await storage.createCustomer({
           name,
           phone,
           email: email || `${phone}@walkin.local`,
@@ -1365,7 +1365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create appointment
       const now = new Date();
       const appointment = await storage.createAppointment({
-        clientId: client.id,
+        customerId: client.id,
         serviceId,
         staffId,
         date: now.toISOString().split('T')[0],
@@ -1387,7 +1387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/walk-in/quick-search', async (req, res) => {
     try {
       const { query } = req.query;
-      const clients = await storage.getClients();
+      const clients = await storage.getCustomers();
       
       const filteredClients = clients.filter(client => 
         client.name.toLowerCase().includes((query as string).toLowerCase()) ||
@@ -1459,6 +1459,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching availability:', error);
       res.status(500).json({ message: 'Failed to fetch availability' });
+    }
+  });
+
+  // Customer Portal API endpoints
+  app.get('/api/customer/services', async (req, res) => {
+    try {
+      const services = await storage.getServices();
+      res.json(services);
+    } catch (error) {
+      console.error('Error fetching services for customer:', error);
+      res.status(500).json({ message: 'Failed to fetch services' });
+    }
+  });
+
+  app.get('/api/customer/staff', async (req, res) => {
+    try {
+      const staff = await storage.getStaff();
+      res.json(staff);
+    } catch (error) {
+      console.error('Error fetching staff for customer:', error);
+      res.status(500).json({ message: 'Failed to fetch staff' });
+    }
+  });
+
+  app.post('/api/customer/login', async (req, res) => {
+    try {
+      const { phone, pin } = req.body;
+      
+      // Find customer by phone
+      const customers = await storage.getCustomers();
+      const customer = customers.find(c => c.phone === phone && c.portalPin === pin);
+      
+      if (!customer) {
+        return res.status(401).json({ message: 'Invalid phone number or PIN' });
+      }
+      
+      res.json(customer);
+    } catch (error) {
+      console.error('Error during customer login:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
+  });
+
+  app.post('/api/customer/register', async (req, res) => {
+    try {
+      const { name, phone, email, portalPin } = req.body;
+      
+      // Check if customer already exists
+      const customers = await storage.getCustomers();
+      const existingCustomer = customers.find(c => c.phone === phone);
+      
+      if (existingCustomer) {
+        return res.status(400).json({ message: 'Customer with this phone number already exists' });
+      }
+      
+      const newCustomer = await storage.createCustomer({
+        name,
+        phone,
+        email,
+        portalPin,
+        notes: 'Registered via customer portal'
+      });
+      
+      res.json(newCustomer);
+    } catch (error) {
+      console.error('Error during customer registration:', error);
+      res.status(500).json({ message: 'Registration failed' });
+    }
+  });
+
+  app.get('/api/customer/:id/appointments', async (req, res) => {
+    try {
+      const customerId = req.params.id;
+      const appointments = await storage.getAppointments();
+      const customerAppointments = appointments.filter(apt => apt.customerId === customerId);
+      res.json(customerAppointments);
+    } catch (error) {
+      console.error('Error fetching customer appointments:', error);
+      res.status(500).json({ message: 'Failed to fetch appointments' });
+    }
+  });
+
+  app.post('/api/customer/book', async (req, res) => {
+    try {
+      const { customerId, serviceId, staffId, date, time, customerNotes } = req.body;
+      
+      // Get service details for pricing
+      const services = await storage.getServices();
+      const service = services.find(s => s.id === serviceId);
+      
+      if (!service) {
+        return res.status(400).json({ message: 'Service not found' });
+      }
+      
+      const appointment = await storage.createAppointment({
+        customerId,
+        serviceId,
+        staffId,
+        date,
+        time,
+        status: 'confirmed',
+        totalAmount: service.price,
+        customerNotes: customerNotes || '',
+        notes: customerNotes || ''
+      });
+      
+      res.json(appointment);
+    } catch (error) {
+      console.error('Error creating customer booking:', error);
+      res.status(500).json({ message: 'Booking failed' });
     }
   });
 

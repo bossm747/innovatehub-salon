@@ -24,7 +24,7 @@ import Preloader from "@/components/preloader";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 
-function Router({ showDocs, setShowDocs }: { showDocs: boolean; setShowDocs: (show: boolean) => void }) {
+function AdminRouter({ showDocs, setShowDocs }: { showDocs: boolean; setShowDocs: (show: boolean) => void }) {
   if (showDocs) {
     return <Documentation onBack={() => setShowDocs(false)} />;
   }
@@ -42,9 +42,17 @@ function Router({ showDocs, setShowDocs }: { showDocs: boolean; setShowDocs: (sh
       <Route path="/marketing" component={Marketing} />
       <Route path="/reports" component={Reports} />
       <Route path="/settings" component={Settings} />
-      <Route path="/customer" component={CustomerPortalMain} />
       <Route path="/walk-in" component={WalkInRegistration} />
       <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function CustomerRouter() {
+  return (
+    <Switch>
+      <Route path="/customer/*:rest?" component={CustomerPortalMain} />
+      <Route component={() => <CustomerPortalMain />} />
     </Switch>
   );
 }
@@ -75,26 +83,36 @@ function App() {
         {appState === 'landing' ? (
           <Landing onEnter={handleEnterApp} />
         ) : (
-          <div className="min-h-screen spa-background">
-            {/* Sidebar */}
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <Switch>
+            {/* Customer Portal Routes */}
+            <Route path="/customer/*:rest?">
+              <CustomerRouter />
+            </Route>
             
-            {/* Main content area */}
-            <div className="admin-main-content">
-              {/* Header */}
-              <Header 
-                onMenuClick={() => setSidebarOpen(true)} 
-                onDocsClick={() => setShowDocs(true)}
-              />
-              
-              {/* Page content */}
-              <main className="p-4 sm:p-6 lg:p-8 xl:p-12 max-w-full overflow-x-hidden bg-slate-50/30">
-                <div className="container-responsive">
-                  <Router showDocs={showDocs} setShowDocs={setShowDocs} />
+            {/* Admin Routes */}
+            <Route>
+              <div className="min-h-screen spa-background">
+                {/* Admin Sidebar */}
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+                
+                {/* Main content area */}
+                <div className="admin-main-content">
+                  {/* Admin Header */}
+                  <Header 
+                    onMenuClick={() => setSidebarOpen(true)} 
+                    onDocsClick={() => setShowDocs(true)}
+                  />
+                  
+                  {/* Page content */}
+                  <main className="p-4 sm:p-6 lg:p-8 xl:p-12 max-w-full overflow-x-hidden bg-slate-50/30">
+                    <div className="container-responsive">
+                      <AdminRouter showDocs={showDocs} setShowDocs={setShowDocs} />
+                    </div>
+                  </main>
                 </div>
-              </main>
-            </div>
-          </div>
+              </div>
+            </Route>
+          </Switch>
         )}
         <Toaster />
       </TooltipProvider>

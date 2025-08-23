@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import CustomerLanding from "./customer-landing";
+import CustomerAuth from "./customer-auth";
 import CustomerDashboard from "./customer-dashboard";
 import CustomerBooking from "./customer-booking";
 
 export default function CustomerPortalMain() {
   const [customer, setCustomer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'register' | 'dashboard'>('landing');
+  const [, navigate] = useLocation();
 
   // Check if customer is already logged in (from localStorage)
   useEffect(() => {
@@ -15,6 +18,7 @@ export default function CustomerPortalMain() {
       try {
         const customerData = JSON.parse(savedCustomer);
         setCustomer(customerData);
+        setCurrentView('dashboard');
       } catch (error) {
         // Clear invalid session data
         localStorage.removeItem('customer-session');
@@ -25,13 +29,27 @@ export default function CustomerPortalMain() {
 
   const handleCustomerLogin = (customerData: any) => {
     setCustomer(customerData);
+    setCurrentView('dashboard');
     // Save to localStorage for persistence
     localStorage.setItem('customer-session', JSON.stringify(customerData));
   };
 
   const handleCustomerLogout = () => {
     setCustomer(null);
+    setCurrentView('landing');
     localStorage.removeItem('customer-session');
+  };
+
+  const handleLoginClick = () => {
+    setCurrentView('login');
+  };
+
+  const handleRegisterClick = () => {
+    setCurrentView('register');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
   };
 
   if (isLoading) {
@@ -51,18 +69,53 @@ export default function CustomerPortalMain() {
         {customer ? (
           <CustomerBooking customer={customer} />
         ) : (
-          <CustomerLanding onCustomerLogin={handleCustomerLogin} />
+          <CustomerAuth 
+            onBack={handleBackToLanding}
+            onCustomerLogin={handleCustomerLogin}
+            defaultTab="register"
+          />
         )}
       </Route>
       <Route path="/customer">
-        {customer ? (
-          <CustomerDashboard 
-            customer={customer} 
-            onLogout={handleCustomerLogout} 
-          />
-        ) : (
-          <CustomerLanding onCustomerLogin={handleCustomerLogin} />
-        )}
+        {(() => {
+          switch (currentView) {
+            case 'login':
+              return (
+                <CustomerAuth 
+                  onBack={handleBackToLanding}
+                  onCustomerLogin={handleCustomerLogin}
+                  defaultTab="login"
+                />
+              );
+            case 'register':
+              return (
+                <CustomerAuth 
+                  onBack={handleBackToLanding}
+                  onCustomerLogin={handleCustomerLogin}
+                  defaultTab="register"
+                />
+              );
+            case 'dashboard':
+              return customer ? (
+                <CustomerDashboard 
+                  customer={customer} 
+                  onLogout={handleCustomerLogout} 
+                />
+              ) : (
+                <CustomerLanding 
+                  onLoginClick={handleLoginClick}
+                  onRegisterClick={handleRegisterClick}
+                />
+              );
+            default:
+              return (
+                <CustomerLanding 
+                  onLoginClick={handleLoginClick}
+                  onRegisterClick={handleRegisterClick}
+                />
+              );
+          }
+        })()}
       </Route>
     </Switch>
   );

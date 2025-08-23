@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
+import CustomerLayout from "@/components/layout/customer-layout";
 
 interface CustomerDashboardProps {
   customer: any;
@@ -73,51 +74,10 @@ export default function CustomerDashboard({ customer, onLogout }: CustomerDashbo
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-4 border-white/20">
-                <AvatarImage src={customer.profileImageUrl} />
-                <AvatarFallback className="bg-white/20 text-white text-xl font-bold">
-                  {customer.name?.charAt(0)?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">
-                  Welcome back, {customer.name}!
-                </h1>
-                <p className="text-purple-100">
-                  Ready for your next relaxing experience?
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button 
-                onClick={handleBookAppointment}
-                className="bg-white text-purple-600 hover:bg-purple-50"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Book Appointment
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={onLogout}
-                className="border-white text-white hover:bg-white/10"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
+    <CustomerLayout customer={customer} onLogout={onLogout}>
+      <div className="space-y-6">
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -382,6 +342,6 @@ export default function CustomerDashboard({ customer, onLogout }: CustomerDashbo
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </CustomerLayout>
   );
 }
