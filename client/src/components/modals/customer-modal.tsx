@@ -281,9 +281,9 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
               <Button 
                 type="submit" 
                 className="button-responsive"
-                disabled={createClientMutation.isPending}
+                disabled={createCustomerMutation.isPending}
               >
-                {createClientMutation.isPending ? "Adding..." : "Add Client"}
+                {createCustomerMutation.isPending ? "Adding..." : "Add Customer"}
               </Button>
             </div>
           </form>
