@@ -79,7 +79,7 @@ export default function BookingCalendar({
   // Book appointment mutation
   const bookMutation = useMutation({
     mutationFn: async (bookingData: {
-      clientId: string;
+      customerId: string;
       serviceId: string;
       staffId: string;
       date: string;
@@ -158,7 +158,7 @@ export default function BookingCalendar({
     }
 
     bookMutation.mutate({
-      clientId: customerId,
+      customerId: customerId,
       serviceId: localSelectedService.id,
       staffId: localSelectedStaff.id,
       date: selectedDate.toISOString().split('T')[0],

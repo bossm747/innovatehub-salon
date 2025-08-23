@@ -8,40 +8,40 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, UserPlus, Users, Calendar, Edit, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import ClientModal from "@/components/modals/client-modal";
+import CustomerModal from "@/components/modals/customer-modal";
 import AppointmentModal from "@/components/modals/appointment-modal";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Clients() {
-  const [clientModalOpen, setClientModalOpen] = useState(false);
+export default function Customers() {
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<any>(null);
-  const [editingClient, setEditingClient] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [editingCustomer, setEditingCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
 
-  const { data: clients, isLoading } = useQuery({
-    queryKey: ["/api/clients"],
+  const { data: customers, isLoading } = useQuery({
+    queryKey: ["/api/customers"],
   });
 
-  const deleteClientMutation = useMutation({
-    mutationFn: (clientId: string) => 
-      apiRequest(`/api/clients/${clientId}`, "DELETE"),
+  const deleteCustomerMutation = useMutation({
+    mutationFn: (customerId: string) => 
+      apiRequest(`/api/customers/${customerId}`, "DELETE"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Success",
-        description: "Client deleted successfully",
+        description: "Customer deleted successfully",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete client",
+        description: "Failed to delete customer",
         variant: "destructive",
       });
     },
@@ -61,10 +61,10 @@ export default function Clients() {
     );
   }
 
-  const filteredClients = (clients as any[])?.filter((client: any) => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || client.status === statusFilter;
+  const filteredCustomers = (customers as any[])?.filter((customer: any) => {
+    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || customer.status === statusFilter;
     return matchesSearch && matchesStatus;
   }) || [];
 
@@ -81,15 +81,15 @@ export default function Clients() {
         <div className="relative z-10 space-y-6 sm:space-y-8 p-4">
         <div className="flex-responsive justify-between">
           <div>
-            <h2 className="text-responsive-lg font-bold text-slate-900">Clients</h2>
-            <p className="mt-2 text-responsive-base text-slate-600">Manage client profiles and history</p>
+            <h2 className="text-responsive-lg font-bold text-slate-900">Customers</h2>
+            <p className="mt-2 text-responsive-base text-slate-600">Manage customer profiles and history</p>
           </div>
           <Button 
             className="button-responsive"
-            onClick={() => setClientModalOpen(true)}
+            onClick={() => setCustomerModalOpen(true)}
           >
             <UserPlus className="mr-2 h-4 w-4" />
-            Add Client
+            Add Customer
           </Button>
         </div>
 
@@ -102,7 +102,7 @@ export default function Clients() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                   <Input
                     type="text"
-                    placeholder="Search clients..."
+                    placeholder="Search customers..."
                     className="pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,10 +111,10 @@ export default function Clients() {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder="All Clients" />
+                  <SelectValue placeholder="All Customers" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Clients</SelectItem>
+                  <SelectItem value="all">All Customers</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
@@ -123,44 +123,44 @@ export default function Clients() {
           </CardContent>
         </Card>
 
-        {/* Clients Grid */}
-        {filteredClients.length === 0 ? (
+        {/* Customers Grid */}
+        {filteredCustomers.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <Users className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No clients found</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">No customers found</h3>
               <p className="text-slate-500 mb-6">
-                {(clients as any[])?.length === 0 
-                  ? "Get started by adding your first client"
+                {(customers as any[])?.length === 0 
+                  ? "Get started by adding your first customer"
                   : "Try adjusting your search or filter criteria"
                 }
               </p>
-              <Button onClick={() => setClientModalOpen(true)}>
+              <Button onClick={() => setCustomerModalOpen(true)}>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Add Client
+                Add Customer
               </Button>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredClients.map((client: any) => (
-              <Card key={client.id} className="bg-gradient-to-br from-slate-50 to-gray-100 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            {filteredCustomers.map((customer: any) => (
+              <Card key={customer.id} className="bg-gradient-to-br from-slate-50 to-gray-100 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={`https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100&seed=${client.id}`} />
+                        <AvatarImage src={`https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100&seed=${customer.id}`} />
                         <AvatarFallback>
-                          {client.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                          {customer.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="text-sm font-medium text-slate-900">{client.name}</h3>
-                        <p className="text-xs text-slate-500">{client.email}</p>
+                        <h3 className="text-sm font-medium text-slate-900">{customer.name}</h3>
+                        <p className="text-xs text-slate-500">{customer.email}</p>
                       </div>
                     </div>
-                    <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
-                      {client.status}
+                    <Badge variant={customer.status === 'active' ? 'default' : 'secondary'}>
+                      {customer.status}
                     </Badge>
                   </div>
                   
@@ -168,19 +168,19 @@ export default function Clients() {
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Last Visit:</span>
                       <span className="text-slate-900">
-                        {client.lastVisit 
-                          ? new Date(client.lastVisit).toLocaleDateString()
+                        {customer.lastVisit 
+                          ? new Date(customer.lastVisit).toLocaleDateString()
                           : 'Never'
                         }
                       </span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Total Visits:</span>
-                      <span className="text-slate-900">{client.totalVisits}</span>
+                      <span className="text-slate-900">{customer.totalVisits}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Total Spent:</span>
-                      <span className="text-slate-900">₱{client.totalSpent}</span>
+                      <span className="text-slate-900">₱{customer.totalSpent}</span>
                     </div>
                   </div>
                   
@@ -190,8 +190,8 @@ export default function Clients() {
                       size="sm" 
                       className="flex-1"
                       onClick={() => {
-                        setEditingClient(client);
-                        setClientModalOpen(true);
+                        setEditingCustomer(customer);
+                        setCustomerModalOpen(true);
                       }}
                     >
                       <Edit className="h-4 w-4 mr-1" />
@@ -201,7 +201,7 @@ export default function Clients() {
                       size="sm" 
                       className="bg-primary hover:bg-primary/90"
                       onClick={() => {
-                        setSelectedClient(client);
+                        setSelectedCustomer(customer);
                         setAppointmentModalOpen(true);
                       }}
                     >
@@ -215,18 +215,18 @@ export default function Clients() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Client</AlertDialogTitle>
+                          <AlertDialogTitle>Delete Customer</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete {client.name}? This will also remove all their appointments and history. This action cannot be undone.
+                            Are you sure you want to delete {customer.name}? This will also remove all their appointments and history. This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction 
-                            onClick={() => deleteClientMutation.mutate(client.id)}
+                            onClick={() => deleteCustomerMutation.mutate(customer.id)}
                             className="bg-red-600 hover:bg-red-700"
                           >
-                            {deleteClientMutation.isPending ? "Deleting..." : "Delete Client"}
+                            {deleteCustomerMutation.isPending ? "Deleting..." : "Delete Customer"}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -240,22 +240,22 @@ export default function Clients() {
         </div>
       </div>
 
-      <ClientModal 
-        open={clientModalOpen} 
+      <CustomerModal 
+        open={customerModalOpen} 
         onOpenChange={(open) => {
-          setClientModalOpen(open);
-          if (!open) setEditingClient(null);
+          setCustomerModalOpen(open);
+          if (!open) setEditingCustomer(null);
         }}
-        client={editingClient}
+        customer={editingCustomer}
       />
       
       <AppointmentModal 
         open={appointmentModalOpen} 
         onOpenChange={(open) => {
           setAppointmentModalOpen(open);
-          if (!open) setSelectedClient(null);
+          if (!open) setSelectedCustomer(null);
         }}
-        appointment={selectedClient ? { clientId: selectedClient.id } : null}
+        appointment={selectedCustomer ? { customerId: selectedCustomer.id } : null}
       />
     </>
   );

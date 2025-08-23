@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { appointments, clients, services, staff, notificationSettings, notificationLog } from "@shared/schema";
+import { appointments, customers, services, staff, notificationSettings, notificationLog } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { sendAppointmentConfirmation, sendAppointmentReminder, sendAppointmentCancellation } from "./email-service";
 import { format, addDays, parseISO } from "date-fns";
@@ -13,12 +13,12 @@ export async function sendAppointmentNotification(
     const appointment = await db
       .select({
         appointment: appointments,
-        client: clients,
+        customer: customers,
         service: services,
         staff: staff,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(services, eq(appointments.serviceId, services.id))
       .leftJoin(staff, eq(appointments.staffId, staff.id))
       .where(eq(appointments.id, appointmentId))
@@ -29,10 +29,10 @@ export async function sendAppointmentNotification(
       return false;
     }
 
-    const { appointment: appt, client, service, staff: staffMember } = appointment[0];
+    const { appointment: appt, customer, service, staff: staffMember } = appointment[0];
 
-    if (!client?.email) {
-      console.error(`Client email not found for appointment: ${appointmentId}`);
+    if (!customer?.email) {
+      console.error(`Customer email not found for appointment: ${appointmentId}`);
       return false;
     }
 
@@ -66,8 +66,8 @@ export async function sendAppointmentNotification(
     const appointmentTime = appt.time;
 
     const emailData = {
-      clientName: client.name,
-      clientEmail: client.email,
+      clientName: customer.name,
+      clientEmail: customer.email,
       serviceName: service?.name || 'Service',
       appointmentDate,
       appointmentTime,
@@ -135,10 +135,10 @@ export async function sendPendingReminders(): Promise<void> {
     const appointmentsNeedingReminders = await db
       .select({
         appointment: appointments,
-        client: clients,
+        customer: customers,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .where(
         and(
           eq(appointments.date, targetDate),

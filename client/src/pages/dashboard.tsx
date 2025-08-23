@@ -18,11 +18,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AppointmentModal from "@/components/modals/appointment-modal";
-import ClientModal from "@/components/modals/client-modal";
+import CustomerModal from "@/components/modals/customer-modal";
 
 export default function Dashboard() {
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
-  const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const { toast } = useToast();
 
   const cancelAppointmentMutation = useMutation({
@@ -168,11 +168,11 @@ export default function Dashboard() {
                   
                   <Button 
                     className="w-full justify-between bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 lg:py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl border-0"
-                    onClick={() => setClientModalOpen(true)}
+                    onClick={() => setCustomerModalOpen(true)}
                   >
                     <div className="flex items-center">
                       <UserPlus className="mr-3 h-5 w-5 lg:h-6 lg:w-6 text-white" />
-                      <span className="text-responsive-base font-medium text-white">Add Client</span>
+                      <span className="text-responsive-base font-medium text-white">Add Customer</span>
                     </div>
                   </Button>
                   
@@ -277,9 +277,9 @@ export default function Dashboard() {
         open={appointmentModalOpen} 
         onOpenChange={setAppointmentModalOpen} 
       />
-      <ClientModal 
-        open={clientModalOpen} 
-        onOpenChange={setClientModalOpen} 
+      <CustomerModal 
+        open={customerModalOpen} 
+        onOpenChange={setCustomerModalOpen} 
       />
     </>
   );

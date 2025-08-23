@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertClientSchema } from "@shared/schema";
+import { insertCustomerSchema } from "@shared/schema";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -33,46 +33,46 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 
-interface ClientModalProps {
+interface CustomerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  client?: any; // For editing existing client
+  customer?: any; // For editing existing customer
 }
 
-export default function ClientModal({ open, onOpenChange, client }: ClientModalProps) {
+export default function CustomerModal({ open, onOpenChange, customer }: CustomerModalProps) {
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof insertClientSchema>>({
-    resolver: zodResolver(insertClientSchema),
+  const form = useForm<z.infer<typeof insertCustomerSchema>>({
+    resolver: zodResolver(insertCustomerSchema),
     defaultValues: {
-      name: client?.name || "",
-      email: client?.email || "",
-      phone: client?.phone || "",
-      address: client?.address || "",
-      dateOfBirth: client?.dateOfBirth || "",
-      notes: client?.notes || "",
-      status: client?.status || "active",
+      name: customer?.name || "",
+      email: customer?.email || "",
+      phone: customer?.phone || "",
+      address: customer?.address || "",
+      dateOfBirth: customer?.dateOfBirth || "",
+      notes: customer?.notes || "",
+      status: customer?.status || "active",
     },
   });
 
-  const createClientMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof insertClientSchema>) => {
-      if (client?.id) {
-        // Update existing client
-        const response = await apiRequest(`/api/clients/${client.id}`, "PUT", data);
+  const createCustomerMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof insertCustomerSchema>) => {
+      if (customer?.id) {
+        // Update existing customer
+        const response = await apiRequest(`/api/customers/${customer.id}`, "PUT", data);
         return response;
       } else {
-        // Create new client
-        const response = await apiRequest("/api/clients", "POST", data);
+        // Create new customer
+        const response = await apiRequest("/api/customers", "POST", data);
         return response;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Success",
-        description: client?.id ? "Client updated successfully" : "Client added successfully",
+        description: customer?.id ? "Customer updated successfully" : "Customer added successfully",
       });
       onOpenChange(false);
       form.reset();
@@ -80,18 +80,18 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || (client?.id ? "Failed to update client" : "Failed to add client"),
+        description: error.message || (customer?.id ? "Failed to update customer" : "Failed to add customer"),
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: z.infer<typeof insertClientSchema>) => {
+  const onSubmit = (data: z.infer<typeof insertCustomerSchema>) => {
     // Validate required fields
     if (!data.name.trim()) {
       toast({
         title: "Error",
-        description: "Please enter client's name",
+        description: "Please enter customer's name",
         variant: "destructive",
       });
       return;
@@ -111,22 +111,22 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
       }
     }
 
-    createClientMutation.mutate(data);
+    createCustomerMutation.mutate(data);
   };
 
-  // Reset form when modal opens/closes or client changes
+  // Reset form when modal opens/closes or customer changes
   useEffect(() => {
-    if (open && client) {
+    if (open && customer) {
       form.reset({
-        name: client.name || "",
-        email: client.email || "",
-        phone: client.phone || "",
-        address: client.address || "",
-        dateOfBirth: client.dateOfBirth || "",
-        notes: client.notes || "",
-        status: client.status || "active",
+        name: customer.name || "",
+        email: customer.email || "",
+        phone: customer.phone || "",
+        address: customer.address || "",
+        dateOfBirth: customer.dateOfBirth || "",
+        notes: customer.notes || "",
+        status: customer.status || "active",
       });
-    } else if (open && !client) {
+    } else if (open && !customer) {
       form.reset({
         name: "",
         email: "",
@@ -137,17 +137,17 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
         status: "active",
       });
     }
-  }, [open, client, form]);
+  }, [open, customer, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="modal-responsive max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-responsive-lg">
-            {client?.id ? "Edit Client" : "Add New Client"}
+            {customer?.id ? "Edit Customer" : "Add New Customer"}
           </DialogTitle>
           <DialogDescription>
-            {client?.id ? "Update client information" : "Add a new client to your salon and spa system"}
+            {customer?.id ? "Update customer information" : "Add a new customer to your salon and spa system"}
           </DialogDescription>
         </DialogHeader>
         
@@ -160,7 +160,7 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter client's full name" {...field} />
+                    <Input placeholder="Enter customer's full name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,7 +174,7 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="client@example.com" {...field} />
+                    <Input type="email" placeholder="customer@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -258,7 +258,7 @@ export default function ClientModal({ open, onOpenChange, client }: ClientModalP
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Any additional notes about the client..."
+                      placeholder="Any additional notes about the customer..."
                       className="resize-none"
                       {...field}
                       value={field.value || ""}

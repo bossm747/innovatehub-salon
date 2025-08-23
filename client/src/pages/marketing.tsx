@@ -83,7 +83,7 @@ export default function Marketing() {
   });
 
   const { data: clients = [] } = useQuery<any[]>({
-    queryKey: ["/api/clients"],
+    queryKey: ["/api/customers"],
   });
 
   const { data: uploadedLeads = [] } = useQuery<any[]>({

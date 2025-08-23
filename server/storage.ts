@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { eq, lt, sql, desc, and } from "drizzle-orm";
 import {
-  clients,
+  customers,
   services,
   staff,
   appointments,
@@ -14,8 +14,8 @@ import {
   aiSettings,
   inventoryAlerts,
   stockMovements,
-  type Client,
-  type InsertClient,
+  type Customer,
+  type InsertCustomer,
   type Service,
   type InsertService,
   type Staff,
@@ -55,12 +55,12 @@ import {
 } from "@shared/schema";
 
 export interface IStorage {
-  // Clients
-  getClient(id: string): Promise<Client | undefined>;
-  getClients(): Promise<Client[]>;
-  createClient(client: InsertClient): Promise<Client>;
-  updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined>;
-  deleteClient(id: string): Promise<boolean>;
+  // Customers
+  getCustomer(id: string): Promise<Customer | undefined>;
+  getCustomers(): Promise<Customer[]>;
+  createCustomer(customer: InsertCustomer): Promise<Customer>;
+  updateCustomer(id: string, customer: Partial<InsertCustomer>): Promise<Customer | undefined>;
+  deleteCustomer(id: string): Promise<boolean>;
 
   // Services
   getService(id: string): Promise<Service | undefined>;
@@ -179,28 +179,28 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // Client methods
-  async getClient(id: string): Promise<Client | undefined> {
-    const [client] = await db.select().from(clients).where(eq(clients.id, id));
-    return client || undefined;
+  // Customer methods
+  async getCustomer(id: string): Promise<Customer | undefined> {
+    const [customer] = await db.select().from(customers).where(eq(customers.id, id));
+    return customer || undefined;
   }
 
-  async getClients(): Promise<Client[]> {
-    return await db.select().from(clients);
+  async getCustomers(): Promise<Customer[]> {
+    return await db.select().from(customers);
   }
 
-  async createClient(client: InsertClient): Promise<Client> {
-    const [newClient] = await db.insert(clients).values(client).returning();
-    return newClient;
+  async createCustomer(customer: InsertCustomer): Promise<Customer> {
+    const [newCustomer] = await db.insert(customers).values(customer).returning();
+    return newCustomer;
   }
 
-  async updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined> {
-    const [updatedClient] = await db.update(clients).set(client).where(eq(clients.id, id)).returning();
-    return updatedClient || undefined;
+  async updateCustomer(id: string, customer: Partial<InsertCustomer>): Promise<Customer | undefined> {
+    const [updatedCustomer] = await db.update(customers).set(customer).where(eq(customers.id, id)).returning();
+    return updatedCustomer || undefined;
   }
 
-  async deleteClient(id: string): Promise<boolean> {
-    const result = await db.delete(clients).where(eq(clients.id, id));
+  async deleteCustomer(id: string): Promise<boolean> {
+    const result = await db.delete(customers).where(eq(customers.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
@@ -269,7 +269,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select({
         id: appointments.id,
-        clientId: appointments.clientId,
+        customerId: appointments.customerId,
         serviceId: appointments.serviceId,
         staffId: appointments.staffId,
         date: appointments.date,
@@ -279,12 +279,12 @@ export class DatabaseStorage implements IStorage {
         notes: appointments.notes,
         totalAmount: appointments.totalAmount,
         createdAt: appointments.createdAt,
-        clientName: clients.name,
+        clientName: customers.name,
         serviceName: services.name,
         staffName: staff.name,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(services, eq(appointments.serviceId, services.id))
       .leftJoin(staff, eq(appointments.staffId, staff.id));
   }
@@ -293,7 +293,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select({
         id: appointments.id,
-        clientId: appointments.clientId,
+        customerId: appointments.customerId,
         serviceId: appointments.serviceId,
         staffId: appointments.staffId,
         date: appointments.date,
@@ -303,12 +303,12 @@ export class DatabaseStorage implements IStorage {
         notes: appointments.notes,
         totalAmount: appointments.totalAmount,
         createdAt: appointments.createdAt,
-        clientName: clients.name,
+        clientName: customers.name,
         serviceName: services.name,
         staffName: staff.name,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(services, eq(appointments.serviceId, services.id))
       .leftJoin(staff, eq(appointments.staffId, staff.id))
       .where(eq(appointments.date, date));
@@ -833,7 +833,7 @@ export class DatabaseStorage implements IStorage {
     }, 0);
 
     // Get totals
-    const [clientCount] = await db.select({ count: sql<number>`count(*)` }).from(clients);
+    const [customerCount] = await db.select({ count: sql<number>`count(*)` }).from(customers);
     const [serviceCount] = await db.select({ count: sql<number>`count(*)` }).from(services);
     const [staffCount] = await db.select({ count: sql<number>`count(*)` }).from(staff);
 
@@ -845,13 +845,13 @@ export class DatabaseStorage implements IStorage {
         id: appointments.id,
         date: appointments.date,
         time: appointments.time,
-        clientName: clients.name,
+        clientName: customers.name,
         serviceName: services.name,
         status: appointments.status,
         totalAmount: appointments.totalAmount,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(services, eq(appointments.serviceId, services.id))
       .where(sql`${appointments.date} >= ${sevenDaysAgo.toISOString().split('T')[0]}`)
       .orderBy(desc(appointments.createdAt))
@@ -865,13 +865,13 @@ export class DatabaseStorage implements IStorage {
         id: appointments.id,
         date: appointments.date,
         time: appointments.time,
-        clientName: clients.name,
+        clientName: customers.name,
         serviceName: services.name,
         status: appointments.status,
         totalAmount: appointments.totalAmount,
       })
       .from(appointments)
-      .leftJoin(clients, eq(appointments.clientId, clients.id))
+      .leftJoin(customers, eq(appointments.customerId, customers.id))
       .leftJoin(services, eq(appointments.serviceId, services.id))
       .where(
         and(
@@ -907,7 +907,7 @@ export class DatabaseStorage implements IStorage {
       todayAppointments: todayAppointments.length,
       dailyRevenue,
       monthlyRevenue,
-      totalClients: clientCount?.count || 0,
+      totalClients: customerCount?.count || 0,
       totalServices: serviceCount?.count || 0,
       totalStaff: staffCount?.count || 0,
       recentAppointments,

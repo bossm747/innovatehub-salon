@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { 
-  clients, 
+  customers, 
   services, 
   staff, 
   appointments, 
@@ -16,7 +16,7 @@ export async function seedDatabase() {
     await db.delete(products);
     await db.delete(services);
     await db.delete(staff);
-    await db.delete(clients);
+    await db.delete(customers);
 
 
     // Seed Staff
@@ -144,7 +144,7 @@ export async function seedDatabase() {
     ]).returning();
 
     // Seed Clients
-    const clientList = await db.insert(clients).values([
+    const customerList = await db.insert(customers).values([
       {
         name: "Isabella Garcia",
         email: "isabella.garcia@gmail.com",
@@ -260,7 +260,7 @@ export async function seedDatabase() {
 
     await db.insert(appointments).values([
       {
-        clientId: clientList[0].id,
+        customerId: customerList[0].id,
         serviceId: serviceList[0].id,
         staffId: staffMembers[0].id,
         date: tomorrow.toISOString().split('T')[0],
@@ -270,7 +270,7 @@ export async function seedDatabase() {
         notes: "First facial treatment"
       },
       {
-        clientId: clientList[1].id,
+        customerId: customerList[1].id,
         serviceId: serviceList[2].id,
         staffId: staffMembers[3].id,
         date: tomorrow.toISOString().split('T')[0],
@@ -280,7 +280,7 @@ export async function seedDatabase() {
         notes: "Regular Swedish massage"
       },
       {
-        clientId: clientList[2].id,
+        customerId: customerList[2].id,
         serviceId: serviceList[5].id,
         staffId: staffMembers[1].id,
         date: nextWeek.toISOString().split('T')[0],
@@ -290,7 +290,7 @@ export async function seedDatabase() {
         notes: "Hair cut and style"
       },
       {
-        clientId: clientList[3].id,
+        customerId: customerList[3].id,
         serviceId: serviceList[3].id,
         staffId: staffMembers[3].id,
         date: nextWeek.toISOString().split('T')[0],
@@ -304,7 +304,7 @@ export async function seedDatabase() {
     console.log("✅ Database seeded successfully!");
     console.log(`👥 ${staffMembers.length} staff members added`);
     console.log(`💆 ${serviceList.length} services added`);
-    console.log(`👤 ${clientList.length} clients added`);
+    console.log(`👤 ${customerList.length} customers added`);
     console.log(`📅 4 appointments scheduled`);
     console.log(`🛍️ 5 products in inventory`);
 

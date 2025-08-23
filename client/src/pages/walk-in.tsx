@@ -104,7 +104,7 @@ export default function WalkInRegistration() {
       setTimeout(() => setShowSuccessMessage(false), 5000);
       
       // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
     },
     onError: (error: Error) => {

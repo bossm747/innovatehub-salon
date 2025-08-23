@@ -54,7 +54,7 @@ import {
 } from "@/components/ui/dialog";
 
 const transactionFormSchema = z.object({
-  clientId: z.string().optional(),
+  customerId: z.string().optional(),
   staffId: z.string().min(1, "Staff member is required"),
   items: z.array(z.object({
     type: z.enum(['service', 'product']),
@@ -107,13 +107,13 @@ export default function POS() {
   });
 
   const { data: clients = [] } = useQuery({
-    queryKey: ["/api/clients"],
+    queryKey: ["/api/customers"],
   });
 
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
-      clientId: "",
+      customerId: "",
       staffId: "",
       items: [],
       subtotal: "0",
@@ -245,7 +245,7 @@ export default function POS() {
 
   const createQuickCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      const response = await apiRequest("/api/clients", "POST", {
+      const response = await apiRequest("/api/customers", "POST", {
         name: customerData.name,
         phone: customerData.phone || "",
         email: customerData.email || "",
@@ -259,7 +259,7 @@ export default function POS() {
       setShowQuickCustomer(false);
       setQuickCustomerName("");
       setQuickCustomerPhone("");
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
       toast({
         title: "Success",
         description: "Customer added successfully",
@@ -287,7 +287,7 @@ export default function POS() {
     }
 
     const transactionData = {
-      clientId: selectedCustomer?.id === null ? undefined : selectedCustomer?.id, // Handle anonymous customer
+      customerId: selectedCustomer?.id === null ? undefined : selectedCustomer?.id, // Handle anonymous customer
       staffId: selectedStaff?.id || (staff as any[])[0]?.id, // Use selected staff or default to first
       items: cart,
       subtotal: subtotal.toFixed(2),

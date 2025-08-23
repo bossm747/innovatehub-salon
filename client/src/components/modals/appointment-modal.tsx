@@ -44,10 +44,10 @@ const appointmentFormSchema = insertAppointmentSchema.extend({
   message: "Appointment must be scheduled for a future date and time",
   path: ["date"]
 }).refine((data) => {
-  return data.clientId && data.serviceId;
+  return data.customerId && data.serviceId;
 }, {
-  message: "Client and service are required",
-  path: ["clientId"]
+  message: "Customer and service are required",
+  path: ["customerId"]
 });
 
 interface AppointmentModalProps {
@@ -59,8 +59,8 @@ interface AppointmentModalProps {
 export default function AppointmentModal({ open, onOpenChange, appointment }: AppointmentModalProps) {
   const { toast } = useToast();
 
-  const { data: clients = [] } = useQuery({
-    queryKey: ["/api/clients"],
+  const { data: customers = [] } = useQuery({
+    queryKey: ["/api/customers"],
   });
 
   const { data: services = [] } = useQuery({
@@ -74,7 +74,7 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
   const form = useForm<z.infer<typeof appointmentFormSchema>>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
-      clientId: appointment?.clientId || "",
+      customerId: appointment?.customerId || "",
       serviceId: appointment?.serviceId || "",
       staffId: appointment?.staffId || "",
       date: appointment?.date || "",
@@ -119,7 +119,7 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
   useEffect(() => {
     if (open && appointment) {
       form.reset({
-        clientId: appointment.clientId || "",
+        customerId: appointment.customerId || "",
         serviceId: appointment.serviceId || "",
         staffId: appointment.staffId || "",
         date: appointment.date || "",
@@ -129,7 +129,7 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
       });
     } else if (open && !appointment) {
       form.reset({
-        clientId: "",
+        customerId: "",
         serviceId: "",
         staffId: "",
         date: "",
@@ -154,7 +154,7 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
     
     // Prepare submission data with proper types
     const submissionData = {
-      clientId: data.clientId,
+      customerId: data.customerId,
       serviceId: data.serviceId,
       staffId: data.staffId || (staff as any[])[0]?.id || "",
       date: data.date,
@@ -184,10 +184,10 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
           <form onSubmit={form.handleSubmit(onSubmit)} className="form-responsive">
             <FormField
               control={form.control}
-              name="clientId"
+              name="customerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Client</FormLabel>
+                  <FormLabel>Customer</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -195,7 +195,7 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(clients as any[]).map((client: any) => (
+                      {(customers as any[]).map((client: any) => (
                         <SelectItem key={client.id} value={client.id}>
                           {client.name}
                         </SelectItem>

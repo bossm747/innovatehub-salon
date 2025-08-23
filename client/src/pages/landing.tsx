@@ -62,7 +62,7 @@ export default function Landing({ onEnter }: LandingProps) {
 
   // Get real business data from database for testimonials and stats
   const { data: clientsData } = useQuery({
-    queryKey: ["/api/clients"],
+    queryKey: ["/api/customers"],
   });
 
   const { data: appointmentsData } = useQuery({

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { aiService } from "./ai-service";
 import {
-  insertClientSchema,
+  insertCustomerSchema,
   insertServiceSchema,
   insertStaffSchema,
   insertAppointmentSchema,
@@ -22,66 +22,66 @@ import { promises as fs } from "fs";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Clients routes
-  app.get("/api/clients", async (req, res) => {
+  // Customers routes
+  app.get("/api/customers", async (req, res) => {
     try {
-      const clients = await storage.getClients();
-      res.json(clients);
+      const customers = await storage.getCustomers();
+      res.json(customers);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch clients" });
+      res.status(500).json({ message: "Failed to fetch customers" });
     }
   });
 
-  app.get("/api/clients/:id", async (req, res) => {
+  app.get("/api/customers/:id", async (req, res) => {
     try {
-      const client = await storage.getClient(req.params.id);
-      if (!client) {
-        return res.status(404).json({ message: "Client not found" });
+      const customer = await storage.getCustomer(req.params.id);
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
       }
-      res.json(client);
+      res.json(customer);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch client" });
+      res.status(500).json({ message: "Failed to fetch customer" });
     }
   });
 
-  app.post("/api/clients", async (req, res) => {
+  app.post("/api/customers", async (req, res) => {
     try {
-      const clientData = insertClientSchema.parse(req.body);
-      const client = await storage.createClient(clientData);
-      res.status(201).json(client);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid client data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to create client" });
-    }
-  });
-
-  app.put("/api/clients/:id", async (req, res) => {
-    try {
-      const clientData = insertClientSchema.partial().parse(req.body);
-      const client = await storage.updateClient(req.params.id, clientData);
-      if (!client) {
-        return res.status(404).json({ message: "Client not found" });
-      }
-      res.json(client);
+      const customerData = insertCustomerSchema.parse(req.body);
+      const customer = await storage.createCustomer(customerData);
+      res.status(201).json(customer);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid client data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid customer data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to update client" });
+      res.status(500).json({ message: "Failed to create customer" });
     }
   });
 
-  app.delete("/api/clients/:id", async (req, res) => {
+  app.put("/api/customers/:id", async (req, res) => {
     try {
-      const deleted = await storage.deleteClient(req.params.id);
+      const customerData = insertCustomerSchema.partial().parse(req.body);
+      const customer = await storage.updateCustomer(req.params.id, customerData);
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.json(customer);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid customer data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update customer" });
+    }
+  });
+
+  app.delete("/api/customers/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteCustomer(req.params.id);
       if (!deleted) {
-        return res.status(404).json({ message: "Client not found" });
+        return res.status(404).json({ message: "Customer not found" });
       }
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete client" });
+      res.status(500).json({ message: "Failed to delete customer" });
     }
   });
 
@@ -1258,7 +1258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/customer/book', async (req, res) => {
     try {
-      const { clientId, serviceId, staffId, date, time, customerNotes } = req.body;
+      const { customerId, serviceId, staffId, date, time, customerNotes } = req.body;
       
       // Get service details for pricing
       const service = await storage.getService(serviceId);
@@ -1267,7 +1267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const appointment = await storage.createAppointment({
-        clientId,
+        customerId,
         serviceId,
         staffId,
         date,
@@ -1290,7 +1290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { name, email, phone, address, dateOfBirth, portalPin } = req.body;
       
-      const client = await storage.createClient({
+      const customer = await storage.createCustomer({
         name,
         email,
         phone,
@@ -1300,7 +1300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         portalPin,
       });
 
-      res.json(client);
+      res.json(customer);
     } catch (error) {
       console.error('Error registering customer:', error);
       res.status(500).json({ message: 'Failed to register customer' });
@@ -1311,26 +1311,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { phone, portalPin } = req.body;
       
-      const clients = await storage.getClients();
-      const client = clients.find(c => c.phone === phone && c.portalPin === portalPin);
+      const customers = await storage.getCustomers();
+      const customer = customers.find(c => c.phone === phone && c.portalPin === portalPin);
       
-      if (!client) {
+      if (!customer) {
         return res.status(401).json({ message: 'Invalid phone number or PIN' });
       }
 
-      res.json(client);
+      res.json(customer);
     } catch (error) {
       console.error('Error logging in customer:', error);
       res.status(500).json({ message: 'Failed to login' });
     }
   });
 
-  app.get('/api/customer/:clientId/appointments', async (req, res) => {
+  app.get('/api/customer/:customerId/appointments', async (req, res) => {
     try {
-      const { clientId } = req.params;
+      const { customerId } = req.params;
       const appointments = await storage.getAppointments();
-      const clientAppointments = appointments.filter(apt => apt.clientId === clientId);
-      res.json(clientAppointments);
+      const customerAppointments = appointments.filter(apt => apt.customerId === customerId);
+      res.json(customerAppointments);
     } catch (error) {
       console.error('Error fetching customer appointments:', error);
       res.status(500).json({ message: 'Failed to fetch appointments' });

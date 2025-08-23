@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-export const clients = pgTable("clients", {
+export const customers = pgTable("customers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -48,7 +48,7 @@ export const staff = pgTable("staff", {
 
 export const appointments = pgTable("appointments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  clientId: varchar("client_id").references(() => clients.id).notNull(),
+  customerId: varchar("customer_id").references(() => customers.id).notNull(),
   serviceId: varchar("service_id").references(() => services.id).notNull(),
   staffId: varchar("staff_id").references(() => staff.id),
   date: text("date").notNull(), // YYYY-MM-DD format
@@ -118,7 +118,7 @@ export const inventoryTransactions = pgTable("inventory_transactions", {
 export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   transactionNumber: text("transaction_number").notNull().unique(),
-  clientId: varchar("client_id").references(() => clients.id),
+  customerId: varchar("customer_id").references(() => customers.id),
   staffId: varchar("staff_id").references(() => staff.id).notNull(),
   items: jsonb("items").notNull().$type<{
     type: 'service' | 'product';
@@ -185,7 +185,7 @@ export const notificationLog = pgTable("notification_log", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertClientSchema = createInsertSchema(clients).omit({
+export const insertCustomerSchema = createInsertSchema(customers).omit({
   id: true,
   totalVisits: true,
   totalSpent: true,
@@ -254,8 +254,8 @@ export const insertNotificationLogSchema = createInsertSchema(notificationLog).o
   createdAt: true,
 });
 
-export type Client = typeof clients.$inferSelect;
-export type InsertClient = z.infer<typeof insertClientSchema>;
+export type Customer = typeof customers.$inferSelect;
+export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Staff = typeof staff.$inferSelect;
@@ -278,7 +278,7 @@ export type NotificationLog = typeof notificationLog.$inferSelect;
 export type InsertNotificationLog = z.infer<typeof insertNotificationLogSchema>;
 
 // Relations
-export const clientsRelations = relations(clients, ({ many }) => ({
+export const customersRelations = relations(customers, ({ many }) => ({
   appointments: many(appointments),
   transactions: many(transactions),
 }));
@@ -295,9 +295,9 @@ export const staffRelations = relations(staff, ({ many }) => ({
 }));
 
 export const appointmentsRelations = relations(appointments, ({ one }) => ({
-  client: one(clients, {
-    fields: [appointments.clientId],
-    references: [clients.id],
+  customer: one(customers, {
+    fields: [appointments.customerId],
+    references: [customers.id],
   }),
   service: one(services, {
     fields: [appointments.serviceId],
@@ -333,9 +333,9 @@ export const inventoryTransactionsRelations = relations(inventoryTransactions, (
 }));
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
-  client: one(clients, {
-    fields: [transactions.clientId],
-    references: [clients.id],
+  customer: one(customers, {
+    fields: [transactions.customerId],
+    references: [customers.id],
   }),
   staff: one(staff, {
     fields: [transactions.staffId],
