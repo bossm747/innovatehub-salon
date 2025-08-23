@@ -207,19 +207,28 @@ export default function Landing({ onEnter }: LandingProps) {
               </Badge>
             </motion.div>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.9, duration: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
+              <Button
+                onClick={() => window.location.href = '/customer'}
+                size="lg"
+                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
+              >
+                <Users className="h-5 w-5 mr-2" />
+                Customer Portal
+              </Button>
               <Button
                 onClick={onEnter}
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
               >
-                Enter Dashboard
-                <ArrowRight className="h-5 w-5 ml-2" />
+                <Shield className="h-5 w-5 mr-2" />
+                Staff Portal
               </Button>
             </motion.div>
           </motion.div>
