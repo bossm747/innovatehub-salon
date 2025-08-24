@@ -125,14 +125,12 @@ export default function CustomerAuth({ onBack, onCustomerLogin, defaultTab = "lo
         {/* Auth Card */}
         <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">JustPause</h1>
-                <p className="text-sm text-gray-600">Customer Portal</p>
-              </div>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/justpause-logo-transparent.png" 
+                alt="JustPause Salon & Spa" 
+                className="h-20 w-auto"
+              />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               {activeTab === "login" ? "Welcome Back" : "Join JustPause"}
@@ -146,7 +144,7 @@ export default function CustomerAuth({ onBack, onCustomerLogin, defaultTab = "lo
           </CardHeader>
           
           <CardContent className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")} className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-gray-100">
                 <TabsTrigger value="login" className="flex items-center gap-2">
                   <Lock className="h-4 w-4" />

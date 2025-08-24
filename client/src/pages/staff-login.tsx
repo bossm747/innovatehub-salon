@@ -50,9 +50,13 @@ export default function StaffLogin({ onSuccess }: StaffLoginProps) {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+              className="mx-auto"
             >
-              <User className="h-8 w-8 text-white" />
+              <img 
+                src="/justpause-logo-transparent.png" 
+                alt="JustPause Salon & Spa" 
+                className="h-20 w-auto"
+              />
             </motion.div>
             <div>
               <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">

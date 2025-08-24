@@ -151,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Store staff in session
-      (req.session as any).staffId = staff.id;
+      (req as any).session.staffId = staff.id;
       
       res.json({ message: "Login successful", staff: { id: staff.id, name: staff.name, email: staff.email, role: staff.role } });
     } catch (error) {
@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/staff/me", async (req, res) => {
     try {
-      const staffId = (req.session as any).staffId;
+      const staffId = (req as any).session.staffId;
       
       if (!staffId) {
         return res.status(401).json({ message: "Not authenticated" });
@@ -182,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/staff/logout", async (req, res) => {
     try {
-      delete (req.session as any).staffId;
+      delete (req as any).session.staffId;
       res.json({ message: "Logout successful" });
     } catch (error) {
       console.error("Staff logout error:", error);
@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Send cancellation notification in the background
-      sendAppointmentNotification(appointment.id, 'cancellation').catch(error => {
+      sendAppointmentNotification(appointment.id, 'reminder').catch(error => {
         console.error('Failed to send appointment cancellation:', error);
       });
       
@@ -1450,6 +1450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             name,
             phone,
             email: email || `${phone}@walkin.local`,
+            portalPin: '0000',
             customerPortalEnabled: false,
           });
         }
@@ -1570,7 +1571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/customer/staff', async (req, res) => {
     try {
-      const staff = await storage.getStaff();
+      const staff = await storage.getAllStaff();
       res.json(staff);
     } catch (error) {
       console.error('Error fetching staff for customer:', error);
