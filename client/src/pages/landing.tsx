@@ -412,17 +412,9 @@ export default function Landing({ onEnter }: LandingProps) {
             <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-700 via-pink-700 to-rose-700 bg-clip-text text-transparent mb-6 drop-shadow-lg">
               Ready to Transform Your Business?
             </h2>
-            <p className="text-xl text-slate-600 mb-10 leading-relaxed">
+            <p className="text-xl text-slate-600 leading-relaxed">
               Join the growing community of successful beauty businesses using JustPause Salon & Spa Management System.
             </p>
-            <Button
-              onClick={onEnter}
-              size="lg"
-              className="px-10 py-4 text-lg font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:via-pink-700 hover:to-rose-700 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-0"
-            >
-              Get Started Now
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
           </motion.div>
         </div>
       </section>
