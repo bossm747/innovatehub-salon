@@ -1,114 +1,94 @@
+
 import { useState, useEffect } from "react";
-import { Route, Switch, useLocation } from "wouter";
-import CustomerLanding from "./customer-landing";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import CustomerAuth from "./customer-auth";
+import CustomerLanding from "./customer-landing";
 import CustomerDashboard from "./customer-dashboard";
 import CustomerBooking from "./customer-booking";
-import { useCustomerAuth } from "@/hooks/useCustomerAuth";
+import CustomerLayout from "@/components/layout/customer-layout";
+import { useCustomerLogout } from "@/hooks/useCustomerAuth";
+import { Loader2 } from "lucide-react";
+
+type CustomerView = 'landing' | 'auth' | 'dashboard' | 'booking';
 
 export default function CustomerPortalMain() {
-  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'register' | 'dashboard'>('landing');
-  const [, navigate] = useLocation();
-  const { customer, isLoading, isAuthenticated } = useCustomerAuth();
+  const [currentView, setCurrentView] = useState<CustomerView>('landing');
+  const { customer, isAuthenticated, isLoading } = useCustomerAuth();
+  const logout = useCustomerLogout();
 
-  // Update view based on authentication status
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated && customer) {
-        setCurrentView('dashboard');
-      } else {
-        setCurrentView('landing');
-      }
-    }
-  }, [isLoading, isAuthenticated, customer]);
-
+  const handleLoginClick = () => setCurrentView('auth');
+  const handleRegisterClick = () => setCurrentView('auth');
+  const handleBackToLanding = () => setCurrentView('landing');
+  
   const handleCustomerLogin = (customerData: any) => {
-    // Authentication is managed by the hook, just update view
     setCurrentView('dashboard');
   };
 
-  const handleCustomerLogout = () => {
-    // Logout is handled by the hook, just update view
-    setCurrentView('landing');
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+      setCurrentView('landing');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Force logout on client side even if server fails
+      setCurrentView('landing');
+      window.location.reload();
+    }
   };
 
-  const handleLoginClick = () => {
-    setCurrentView('login');
-  };
+  const handleBookAppointment = () => setCurrentView('booking');
+  const handleBackToDashboard = () => setCurrentView('dashboard');
 
-  const handleRegisterClick = () => {
-    setCurrentView('register');
-  };
-
-  const handleBackToLanding = () => {
-    setCurrentView('landing');
-  };
-
+  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your session...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <Switch>
-      <Route path="/customer/book">
-        {customer ? (
-          <CustomerBooking customer={customer} />
-        ) : (
-          <CustomerAuth 
-            onBack={handleBackToLanding}
-            onCustomerLogin={handleCustomerLogin}
-            defaultTab="register"
+  // If authenticated, show customer dashboard or booking
+  if (isAuthenticated && customer) {
+    if (currentView === 'booking') {
+      return (
+        <CustomerLayout customer={customer} onLogout={handleLogout}>
+          <CustomerBooking 
+            customer={customer}
+            onBack={handleBackToDashboard}
           />
-        )}
-      </Route>
-      <Route path="/customer">
-        {(() => {
-          switch (currentView) {
-            case 'login':
-              return (
-                <CustomerAuth 
-                  onBack={handleBackToLanding}
-                  onCustomerLogin={handleCustomerLogin}
-                  defaultTab="login"
-                />
-              );
-            case 'register':
-              return (
-                <CustomerAuth 
-                  onBack={handleBackToLanding}
-                  onCustomerLogin={handleCustomerLogin}
-                  defaultTab="register"
-                />
-              );
-            case 'dashboard':
-              return customer ? (
-                <CustomerDashboard 
-                  customer={customer} 
-                  onLogout={handleCustomerLogout} 
-                />
-              ) : (
-                <CustomerLanding 
-                  onLoginClick={handleLoginClick}
-                  onRegisterClick={handleRegisterClick}
-                />
-              );
-            default:
-              return (
-                <CustomerLanding 
-                  onLoginClick={handleLoginClick}
-                  onRegisterClick={handleRegisterClick}
-                />
-              );
-          }
-        })()}
-      </Route>
-    </Switch>
+        </CustomerLayout>
+      );
+    }
+
+    return (
+      <CustomerLayout customer={customer} onLogout={handleLogout}>
+        <CustomerDashboard 
+          customer={customer}
+          onBookAppointment={handleBookAppointment}
+        />
+      </CustomerLayout>
+    );
+  }
+
+  // If not authenticated, show landing or auth based on current view
+  if (currentView === 'auth') {
+    return (
+      <CustomerAuth 
+        onBack={handleBackToLanding}
+        onCustomerLogin={handleCustomerLogin}
+      />
+    );
+  }
+
+  // Default to landing page
+  return (
+    <CustomerLanding 
+      onLoginClick={handleLoginClick}
+      onRegisterClick={handleRegisterClick}
+    />
   );
 }

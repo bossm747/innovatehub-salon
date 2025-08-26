@@ -5,12 +5,14 @@ export function useStaffAuth() {
   const { data: staff, isLoading, error } = useQuery({
     queryKey: ["/api/staff/me"],
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 
   return {
     staff,
     isLoading,
-    isAuthenticated: !!staff,
+    isAuthenticated: !!staff && !error,
     error,
   };
 }
@@ -24,8 +26,15 @@ export function useStaffLogin() {
       const response = await apiRequest("/api/staff/login", "POST", { email, password });
       return response;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Set the staff data directly in the cache
+      queryClient.setQueryData(["/api/staff/me"], data.staff);
       queryClient.invalidateQueries({ queryKey: ["/api/staff/me"] });
+    },
+    onError: (error) => {
+      console.error('Staff login error:', error);
+      // Clear any stale authentication data
+      queryClient.setQueryData(["/api/staff/me"], null);
     },
   });
 }

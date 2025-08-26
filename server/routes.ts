@@ -25,12 +25,15 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'justpause-dev-secret',
+    secret: process.env.SESSION_SECRET || 'justpause-dev-secret-key-2024',
     resave: false,
     saveUninitialized: false,
+    name: 'justpause.sid',
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
     }
   }));
   // Customers routes
@@ -164,7 +167,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store staff in session
       (req as any).session.staffId = staff.id;
       
-      res.json({ message: "Login successful", staff: { id: staff.id, name: staff.name, email: staff.email, role: staff.role } });
+      // Save session explicitly
+      (req as any).session.save((err: any) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Login failed - session error" });
+        }
+        
+        res.json({ 
+          message: "Login successful", 
+          staff: { 
+            id: staff.id, 
+            name: staff.name, 
+            email: staff.email, 
+            role: staff.role 
+          } 
+        });
+      });
     } catch (error) {
       console.error("Staff login error:", error);
       res.status(500).json({ message: "Login failed" });
@@ -193,8 +212,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/staff/logout", async (req, res) => {
     try {
-      delete (req as any).session.staffId;
-      res.json({ message: "Logout successful" });
+      (req as any).session.destroy((err: any) => {
+        if (err) {
+          console.error("Staff logout error:", err);
+          return res.status(500).json({ message: "Logout failed" });
+        }
+        
+        res.clearCookie('justpause.sid');
+        res.json({ message: "Logout successful" });
+      });
     } catch (error) {
       console.error("Staff logout error:", error);
       res.status(500).json({ message: "Logout failed" });
@@ -1594,6 +1620,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { phone, pin } = req.body;
       
+      if (!phone || !pin) {
+        return res.status(400).json({ message: 'Phone number and PIN are required' });
+      }
+      
       // Find customer by phone and PIN
       const customers = await storage.getCustomers();
       const customer = customers.find(c => c.phone === phone && c.portalPin === pin);
@@ -1606,7 +1636,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       (req as any).session.customerId = customer.id;
       (req as any).session.customerData = customer;
       
-      res.json(customer);
+      // Save session explicitly
+      (req as any).session.save((err: any) => {
+        if (err) {
+          console.error("Customer session save error:", err);
+          return res.status(500).json({ message: "Login failed - session error" });
+        }
+        
+        res.json(customer);
+      });
     } catch (error) {
       console.error('Error during customer login:', error);
       res.status(500).json({ message: 'Login failed' });
@@ -1679,8 +1717,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/customer/logout', (req, res) => {
     (req as any).session.destroy((err: any) => {
       if (err) {
+        console.error("Customer logout error:", err);
         return res.status(500).json({ message: 'Logout failed' });
       }
+      
+      res.clearCookie('justpause.sid');
       res.json({ message: 'Logged out successfully' });
     });
   });

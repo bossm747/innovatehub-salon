@@ -79,9 +79,16 @@ function AppWithAuth() {
 
   // Check if we're accessing customer portal directly
   const isCustomerRoute = window.location.pathname.startsWith('/customer');
+  const isStaffRoute = !isCustomerRoute;
 
   const handlePreloaderComplete = () => {
-    setAppState('landing');
+    // Check if user has visited before
+    const hasVisited = localStorage.getItem('serenity-spa-visited');
+    if (hasVisited && isStaffRoute) {
+      setAppState('app');
+    } else {
+      setAppState('landing');
+    }
   };
 
   const handleEnterApp = () => {

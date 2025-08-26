@@ -5,12 +5,14 @@ export function useCustomerAuth() {
   const { data: customer, isLoading, error } = useQuery({
     queryKey: ["/api/customer/me"],
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 
   return {
     customer,
     isLoading,
-    isAuthenticated: !!customer,
+    isAuthenticated: !!customer && !error,
     error,
   };
 }
@@ -24,8 +26,15 @@ export function useCustomerLogin() {
       const response = await apiRequest("/api/customer/login", "POST", { phone, pin });
       return response;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Set the customer data directly in the cache
+      queryClient.setQueryData(["/api/customer/me"], data);
       queryClient.invalidateQueries({ queryKey: ["/api/customer/me"] });
+    },
+    onError: (error) => {
+      console.error('Customer login error:', error);
+      // Clear any stale authentication data
+      queryClient.setQueryData(["/api/customer/me"], null);
     },
   });
 }
