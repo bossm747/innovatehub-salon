@@ -33,9 +33,16 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 
-const appointmentFormSchema = insertAppointmentSchema.extend({
+const appointmentFormSchema = z.object({
+  customerId: z.string().min(1, "Customer is required"),
+  serviceId: z.string().min(1, "Service is required"),
+  staffId: z.string().optional(),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
+  status: z.string().default("confirmed"),
+  notes: z.string().optional(),
+  customerNotes: z.string().optional(),
+  totalAmount: z.string().optional(),
 }).refine((data) => {
   const appointmentDateTime = new Date(`${data.date}T${data.time}`);
   const now = new Date();
@@ -43,11 +50,6 @@ const appointmentFormSchema = insertAppointmentSchema.extend({
 }, {
   message: "Appointment must be scheduled for a future date and time",
   path: ["date"]
-}).refine((data) => {
-  return data.customerId && data.serviceId;
-}, {
-  message: "Customer and service are required",
-  path: ["customerId"]
 });
 
 interface AppointmentModalProps {
@@ -74,13 +76,15 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
   const form = useForm<z.infer<typeof appointmentFormSchema>>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
-      customerId: appointment?.customerId || "",
-      serviceId: appointment?.serviceId || "",
-      staffId: appointment?.staffId || "",
-      date: appointment?.date || "",
-      time: appointment?.time || "",
-      status: appointment?.status || "confirmed",
-      notes: appointment?.notes || "",
+      customerId: "",
+      serviceId: "",
+      staffId: "",
+      date: "",
+      time: "",
+      status: "confirmed",
+      notes: "",
+      customerNotes: "",
+      totalAmount: "",
     },
   });
 
@@ -156,19 +160,32 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
       return;
     }
     
+    // Get default staff if none selected
+    const selectedStaffId = data.staffId || (staff as any[])?.[0]?.id;
+    if (!selectedStaffId) {
+      toast({
+        title: "Error",
+        description: "Please select a staff member or ensure staff data is loaded",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Prepare submission data with proper types
     const submissionData = {
       customerId: data.customerId,
       serviceId: data.serviceId,
-      staffId: data.staffId || (staff as any[])[0]?.id || "",
+      staffId: selectedStaffId,
       date: data.date,
       time: data.time,
       duration: selectedService.duration,
       status: data.status || "confirmed",
       notes: data.notes || "",
       totalAmount: selectedService.price.toString(),
+      bookingSource: "staff"
     };
     
+    console.log('Submitting appointment data:', submissionData);
     createAppointmentMutation.mutate(submissionData);
   };
 
@@ -216,17 +233,17 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
               name="serviceId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Service</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel>Service *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a service" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(services as any[]).map((service: any) => (
+                      {Array.isArray(services) && services.map((service: any) => (
                         <SelectItem key={service.id} value={service.id}>
-                          {service.name} - {service.duration} min
+                          {service.name} - {service.duration} min - ₱{service.price}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -271,16 +288,16 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Therapist</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a therapist" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(staff as any[]).map((member: any) => (
+                      {Array.isArray(staff) && staff.map((member: any) => (
                         <SelectItem key={member.id} value={member.id}>
-                          {member.name}
+                          {member.name} - {member.role}
                         </SelectItem>
                       ))}
                     </SelectContent>

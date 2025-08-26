@@ -7,42 +7,52 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-export async function apiRequest(
-  path: string,
-  method = "GET",
-  body?: any
-): Promise<any> {
+export async function apiRequest(path: string, method: string = "GET", body?: any) {
   try {
-    const response = await fetch(path, {
+    const config: RequestInit = {
       method,
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies/session
-      body: body ? JSON.stringify(body) : undefined,
-    });
+      credentials: 'include',
+    };
 
-    if (!response.ok) {
-      let errorMessage = `HTTP error! status: ${response.status}`;
-
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch {
-        // If we can't parse JSON, use the default message
-      }
-
-      throw new Error(errorMessage);
+    if (body && (method === "POST" || method === "PUT" || method === "PATCH")) {
+      config.body = JSON.stringify(body);
     }
 
+    console.log(`API Request: ${method} ${path}`, body ? { body } : {});
+    const response = await fetch(path, config);
+
+    let responseData;
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-      return response.json();
+      responseData = await response.json();
+    } else {
+      responseData = await response.text();
     }
 
-    return response.text();
+    if (!response.ok) {
+      console.error("API Request Error:", { 
+        path, 
+        method, 
+        body, 
+        status: response.status,
+        statusText: response.statusText,
+        error: responseData 
+      });
+      throw new Error(responseData?.message || responseData || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    console.log(`API Response: ${method} ${path}`, responseData);
+    return responseData;
   } catch (error) {
-    console.error('API Request Error:', { path, method, body, error });
+    console.error("API Request Error:", { 
+      path, 
+      method, 
+      body, 
+      error: error instanceof Error ? error.message : error 
+    });
     throw error;
   }
 }

@@ -297,6 +297,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/appointments", async (req, res) => {
     try {
+      console.log('Received appointment data:', req.body);
+      
       // Validate required fields
       if (!req.body.customerId) {
         return res.status(400).json({ message: "Customer ID is required" });
@@ -311,7 +313,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Time is required" });
       }
 
-      const appointmentData = insertAppointmentSchema.parse(req.body);
+      // Parse and validate the appointment data
+      const appointmentData = insertAppointmentSchema.parse({
+        ...req.body,
+        duration: req.body.duration || 60,
+        status: req.body.status || "confirmed",
+        totalAmount: req.body.totalAmount ? parseFloat(req.body.totalAmount) : 0,
+        bookingSource: req.body.bookingSource || "staff"
+      });
+      
+      console.log('Parsed appointment data:', appointmentData);
       const appointment = await storage.createAppointment(appointmentData);
       
       // Send confirmation email in the background
