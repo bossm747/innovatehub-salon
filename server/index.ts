@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { startReminderScheduler } from "./notification-service";
+import { runMigrations } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -61,6 +62,9 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
+  // Run database migrations
+  await runMigrations();
+
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen({
     port,

@@ -85,7 +85,7 @@ export interface IStorage {
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined>;
   deleteAppointment(id: string): Promise<boolean>;
-  
+
   // Walk-in Management
   getWalkInWaitingList(): Promise<any[]>;
   searchCustomersQuick(query: string): Promise<Customer[]>;
@@ -270,7 +270,7 @@ export class DatabaseStorage implements IStorage {
         .select()
         .from(staff)
         .where(and(eq(staff.email, email), eq(staff.password, password), eq(staff.isActive, true)));
-      
+
       return staffMember || null;
     } catch (error) {
       console.error("Staff authentication error:", error);
@@ -301,6 +301,11 @@ export class DatabaseStorage implements IStorage {
         clientName: customers.name,
         serviceName: services.name,
         staffName: staff.name,
+        bookingSource: appointments.bookingSource,
+        waitingListPosition: appointments.waitingListPosition,
+        signatureUrl: appointments.signatureUrl,
+        checkedInAt: appointments.checkedInAt,
+        customerNotes: appointments.customerNotes,
       })
       .from(appointments)
       .leftJoin(customers, eq(appointments.customerId, customers.id))
@@ -325,6 +330,11 @@ export class DatabaseStorage implements IStorage {
         clientName: customers.name,
         serviceName: services.name,
         staffName: staff.name,
+        bookingSource: appointments.bookingSource,
+        waitingListPosition: appointments.waitingListPosition,
+        signatureUrl: appointments.signatureUrl,
+        checkedInAt: appointments.checkedInAt,
+        customerNotes: appointments.customerNotes,
       })
       .from(appointments)
       .leftJoin(customers, eq(appointments.customerId, customers.id))
@@ -333,14 +343,28 @@ export class DatabaseStorage implements IStorage {
       .where(eq(appointments.date, date));
   }
 
-  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
-    const [newAppointment] = await db.insert(appointments).values(appointment).returning();
+  async createAppointment(appointmentData: InsertAppointment): Promise<Appointment> {
+    const safeAppointmentData = {
+      ...appointmentData,
+      bookingSource: appointmentData.bookingSource || 'walk-in',
+      waitingListPosition: appointmentData.waitingListPosition || null,
+      signatureUrl: appointmentData.signatureUrl || null,
+      checkedInAt: appointmentData.checkedInAt || null,
+      customerNotes: appointmentData.customerNotes || null,
+    };
+
+    const [newAppointment] = await db.insert(appointments).values(safeAppointmentData).returning();
     return newAppointment;
   }
 
-  async updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined> {
-    const [updatedAppointment] = await db.update(appointments).set(appointment).where(eq(appointments.id, id)).returning();
-    return updatedAppointment || undefined;
+  async updateAppointment(id: string, appointmentData: Partial<InsertAppointment>): Promise<Appointment | undefined> {
+    try {
+      const [updatedAppointment] = await db.update(appointments).set(appointmentData).where(eq(appointments.id, id)).returning();
+      return updatedAppointment || undefined;
+    } catch (error) {
+      console.error('Update appointment error:', error);
+      throw error;
+    }
   }
 
   async deleteAppointment(id: string): Promise<boolean> {
@@ -370,7 +394,7 @@ export class DatabaseStorage implements IStorage {
           )
         )
         .orderBy(appointments.createdAt);
-      
+
       return waitingList;
     } catch (error) {
       console.error("Get waiting list error:", error);
@@ -392,7 +416,7 @@ export class DatabaseStorage implements IStorage {
           )
         )
         .limit(10);
-      
+
       return results;
     } catch (error) {
       console.error("Quick search error:", error);
@@ -444,11 +468,11 @@ export class DatabaseStorage implements IStorage {
   // Stock Movement Tracking
   async getStockMovements(productId?: string, limit: number = 50): Promise<StockMovement[]> {
     let query = db.select().from(stockMovements).orderBy(desc(stockMovements.createdAt)).limit(limit);
-    
+
     if (productId) {
       query = query.where(eq(stockMovements.productId, productId)) as any;
     }
-    
+
     return await query;
   }
 
@@ -585,7 +609,7 @@ export class DatabaseStorage implements IStorage {
     const product = await this.getProduct(transaction.productId);
     if (product) {
       let newStock = product.currentStock;
-      
+
       switch (transaction.type) {
         case 'purchase':
         case 'adjustment':
@@ -596,7 +620,7 @@ export class DatabaseStorage implements IStorage {
           newStock -= transaction.quantity;
           break;
       }
-      
+
       await this.updateProduct(transaction.productId, { currentStock: newStock });
     }
 
@@ -660,7 +684,7 @@ export class DatabaseStorage implements IStorage {
   async clockOut(id: string, data: { notes?: string }): Promise<TimeRecord> {
     const clockOutTime = new Date();
     const [existing] = await db.select().from(timeRecords).where(eq(timeRecords.id, id));
-    
+
     if (!existing) {
       throw new Error("Time record not found");
     }
@@ -734,7 +758,7 @@ export class DatabaseStorage implements IStorage {
   async createOrUpdateNotificationSettings(settingsData: InsertNotificationSettings): Promise<NotificationSettings> {
     // Check if settings already exist
     const existing = await this.getNotificationSettings();
-    
+
     if (existing) {
       // Update existing settings
       const [updatedSettings] = await db
@@ -807,14 +831,14 @@ export class DatabaseStorage implements IStorage {
     // Update campaign status to sent and set sent date
     const [campaign] = await db
       .update(campaigns)
-      .set({ 
-        status: 'sent', 
+      .set({
+        status: 'sent',
         sentDate: new Date(),
         updatedAt: new Date()
       })
       .where(eq(campaigns.id, id))
       .returning();
-    
+
     return campaign;
   }
 
@@ -852,7 +876,7 @@ export class DatabaseStorage implements IStorage {
   }> {
     const totalCampaigns = await db.select({ count: sql<number>`count(*)` }).from(campaigns);
     const sentCampaigns = await db.select({ count: sql<number>`count(*)` }).from(campaigns).where(eq(campaigns.status, 'sent'));
-    
+
     return {
       totalCampaigns: totalCampaigns[0]?.count || 0,
       totalSent: sentCampaigns[0]?.count || 0,
@@ -880,7 +904,7 @@ export class DatabaseStorage implements IStorage {
 
     // Get today's appointments with client and service names
     const todayAppointments = await this.getAppointmentsByDate(today);
-    
+
     // Get monthly appointments for revenue calculation
     const monthlyAppointments = await db
       .select({
@@ -992,11 +1016,11 @@ export class DatabaseStorage implements IStorage {
     // Get time records grouped by staff
     const records = await db.select().from(timeRecords);
     const staffMembers = await db.select().from(staff);
-    
+
     // Calculate attendance metrics for each staff member
     const report = staffMembers.map((staffMember) => {
       const staffRecords = records.filter(record => record.staffId === staffMember.id);
-      
+
       const totalHours = staffRecords.reduce((sum, record) => {
         if (record.clockOut) {
           const start = new Date(record.clockIn);
@@ -1006,11 +1030,11 @@ export class DatabaseStorage implements IStorage {
         }
         return sum;
       }, 0);
-      
+
       const daysWorked = staffRecords.filter(record => record.clockOut).length;
       const attendanceRate = Math.min(100, (daysWorked / 30) * 100); // Assuming 30-day period
       const punctualityScore = Math.random() * 30 + 70; // Mock score between 70-100
-      
+
       return {
         staffId: staffMember.id,
         totalHours: Math.round(totalHours),
@@ -1019,7 +1043,7 @@ export class DatabaseStorage implements IStorage {
         punctualityScore: Math.round(punctualityScore),
       };
     });
-    
+
     return report;
   }
 
@@ -1031,7 +1055,7 @@ export class DatabaseStorage implements IStorage {
 
   async createOrUpdateBusinessProfile(profile: Partial<InsertBusinessProfile>): Promise<BusinessProfile> {
     const existingProfile = await this.getBusinessProfile();
-    
+
     if (existingProfile) {
       const [updatedProfile] = await db.update(businessProfile)
         .set({ ...profile, updatedAt: new Date() })
@@ -1054,7 +1078,7 @@ export class DatabaseStorage implements IStorage {
 
   async createOrUpdateAiSettings(settings: Partial<InsertAiSettings>): Promise<AiSettings> {
     const existingSettings = await this.getAiSettings();
-    
+
     if (existingSettings) {
       const [updatedSettings] = await db.update(aiSettings)
         .set({ ...settings, updatedAt: new Date() })

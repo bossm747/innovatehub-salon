@@ -30,11 +30,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     saveUninitialized: false,
     name: 'justpause.sid',
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for development
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
-    }
+      sameSite: 'lax'
+    },
+    rolling: true // Extend session on each request
   }));
   // Customers routes
   app.get("/api/customers", async (req, res) => {
@@ -346,7 +347,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: "Appointment cancelled successfully", appointment });
     } catch (error) {
-      res.status(500).json({ message: "Failed to cancel appointment" });
+      console.error('Cancel appointment error:', error);
+      res.status(500).json({ 
+        message: "Failed to cancel appointment",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

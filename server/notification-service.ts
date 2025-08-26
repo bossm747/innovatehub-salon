@@ -5,8 +5,8 @@ import { sendAppointmentConfirmation, sendAppointmentReminder, sendAppointmentCa
 import { format, addDays, parseISO } from "date-fns";
 
 export async function sendAppointmentNotification(
-  appointmentId: string, 
-  type: 'confirmation' | 'reminder'
+  appointmentId: string,
+  type: 'confirmation' | 'reminder' | 'cancellation' // Added 'cancellation' to the type union
 ): Promise<boolean> {
   try {
     // Get appointment with related data
@@ -82,7 +82,7 @@ export async function sendAppointmentNotification(
       success = await sendAppointmentConfirmation(emailData);
     } else if (type === 'reminder') {
       success = await sendAppointmentReminder(emailData);
-    } else if (type === 'cancellation') {
+    } else if (type === 'cancellation') { // Handle cancellation specifically
       success = await sendAppointmentCancellation(emailData);
     }
 
@@ -99,7 +99,7 @@ export async function sendAppointmentNotification(
     return success;
   } catch (error) {
     console.error(`Error sending ${type} notification:`, error);
-    
+
     // Log the error
     await db.insert(notificationLog).values({
       appointmentId,
@@ -126,46 +126,55 @@ export async function sendPendingReminders(): Promise<void> {
       return;
     }
 
-    const reminderHours = spaSettings.reminderHours || 24;
-    
-    // Calculate the target date for reminders (e.g., tomorrow for 24-hour reminders)
-    const targetDate = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-    
+    // The reminderHours should be directly accessible from spaSettings if it exists
+    const reminderHours = spaSettings.reminderHours || 24; 
+
+    const now = new Date();
+    // Calculate the target time for reminders
+    const reminderTime = new Date(now.getTime() + reminderHours * 60 * 60 * 1000);
+
     // Find appointments that need reminders
     const appointmentsNeedingReminders = await db
       .select({
-        appointment: appointments,
-        customer: customers,
+        id: appointments.id,
+        customerId: appointments.customerId,
+        date: appointments.date,
+        time: appointments.time,
+        serviceName: services.name,
+        customerName: customers.name,
+        customerEmail: customers.email,
+        staffName: staff.name,
       })
       .from(appointments)
       .leftJoin(customers, eq(appointments.customerId, customers.id))
+      .leftJoin(services, eq(appointments.serviceId, services.id))
+      .leftJoin(staff, eq(appointments.staffId, staff.id))
       .where(
         and(
-          eq(appointments.date, targetDate),
-          eq(appointments.status, 'confirmed')
+          eq(appointments.status, 'confirmed'),
+          // Ensure we are comparing dates correctly
+          gte(appointments.date, format(now, 'yyyy-MM-dd')),
+          // Check if reminder has already been sent
+          sql`NOT EXISTS (
+            SELECT 1 FROM notification_log
+            WHERE appointment_id = ${appointments.id}
+            AND type = 'reminder'
+            AND status = 'sent'
+          )`
         )
       );
 
-    // Check which appointments haven't received reminders yet
-    for (const { appointment: appt } of appointmentsNeedingReminders) {
-      const existingReminder = await db
-        .select()
-        .from(notificationLog)
-        .where(
-          and(
-            eq(notificationLog.appointmentId, appt.id),
-            eq(notificationLog.type, 'reminder'),
-            eq(notificationLog.status, 'sent')
-          )
-        )
-        .limit(1);
-
-      if (existingReminder.length === 0) {
-        await sendAppointmentNotification(appt.id, 'reminder');
+    for (const { id, customerEmail } of appointmentsNeedingReminders) {
+      // If customerEmail is available, send the reminder
+      if (customerEmail) {
+        await sendAppointmentNotification(id, 'reminder');
+      } else {
+        console.warn(`Skipping reminder for appointment ${id}: Customer email not found.`);
       }
     }
   } catch (error) {
     console.error('Error sending pending reminders:', error);
+    // Log the error if possible, though this function doesn't have appointmentId context for logging
   }
 }
 
@@ -173,7 +182,7 @@ export async function sendPendingReminders(): Promise<void> {
 export function startReminderScheduler(): void {
   // Send reminders every hour
   setInterval(sendPendingReminders, 60 * 60 * 1000);
-  
+
   // Send initial batch on startup
   setTimeout(sendPendingReminders, 5000);
 }
