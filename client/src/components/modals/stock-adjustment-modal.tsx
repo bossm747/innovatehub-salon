@@ -159,9 +159,13 @@ export default function StockAdjustmentModal({
                       <Input 
                         type="number" 
                         min="1"
+                        step="1"
                         placeholder="Enter quantity"
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? 1 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(value) ? 1 : Math.max(1, value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -181,7 +185,12 @@ export default function StockAdjustmentModal({
                         min="0" 
                         step="0.01"
                         placeholder="0.00"
-                        {...field}
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? "0" : e.target.value;
+                          const numValue = parseFloat(value);
+                          field.onChange(isNaN(numValue) ? "0" : Math.max(0, numValue).toString());
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

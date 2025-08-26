@@ -153,7 +153,9 @@ export default function SupplierModal({ open, onOpenChange }: SupplierModalProps
                     <Textarea 
                       placeholder="Enter supplier address" 
                       rows={3}
-                      {...field} 
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -171,7 +173,9 @@ export default function SupplierModal({ open, onOpenChange }: SupplierModalProps
                     <Textarea 
                       placeholder="Any additional notes about the supplier" 
                       rows={3}
-                      {...field} 
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />

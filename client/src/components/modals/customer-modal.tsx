@@ -188,7 +188,12 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="(555) 123-4567" {...field} value={field.value || ""} />
+                    <Input 
+                      placeholder="(555) 123-4567" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -206,7 +211,8 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
                       placeholder="Client's address"
                       className="resize-none"
                       {...field}
-                      value={field.value || ""}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -221,7 +227,36 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
                 <FormItem>
                   <FormLabel>Date of Birth</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} value={field.value || ""} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="portalPin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Portal PIN (4 digits)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="password"
+                      placeholder="1234"
+                      maxLength={4}
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                        field.onChange(value);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -234,7 +269,7 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                  <Select onValueChange={field.onChange} value={field.value ?? "active"}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -261,7 +296,8 @@ export default function CustomerModal({ open, onOpenChange, customer }: Customer
                       placeholder="Any additional notes about the customer..."
                       className="resize-none"
                       {...field}
-                      value={field.value || ""}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />

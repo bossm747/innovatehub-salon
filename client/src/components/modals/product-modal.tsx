@@ -302,9 +302,13 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                       <Input 
                         type="number" 
                         min="0"
-                        {...field}
-                        value={field.value || 0}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        step="1"
+                        placeholder="0"
+                        value={field.value?.toString() ?? "0"}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(value) ? 0 : Math.max(0, value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -322,14 +326,43 @@ export default function ProductModal({ open, onOpenChange }: ProductModalProps) 
                       <Input 
                         type="number" 
                         min="0"
-                        {...field}
-                        value={field.value || 0}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        step="1"
+                        placeholder="10"
+                        value={field.value?.toString() ?? "10"}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? 10 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(value) ? 10 : Math.max(0, value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              <FormField
+                control={form.control}
+                name="maxStockLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Stock Level</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0"
+                        step="1"
+                        placeholder="100"
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? null : parseInt(e.target.value, 10);
+                          field.onChange(value === null || isNaN(value) ? null : Math.max(0, value));
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               />
 
               <FormField

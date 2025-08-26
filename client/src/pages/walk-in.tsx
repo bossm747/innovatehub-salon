@@ -192,18 +192,27 @@ export default function WalkInRegistration() {
       return;
     }
 
+    if (!appointmentForm.staffId) {
+      toast({
+        title: "Staff member required",
+        description: "Please select a staff member.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     let clientData;
     if (selectedClient) {
       clientData = {
         customerId: selectedClient.id,
         name: selectedClient.name,
-        phone: selectedClient.phone,
-        email: selectedClient.email,
-        signature: signature,
+        phone: selectedClient.phone ?? "",
+        email: selectedClient.email ?? "",
+        signature: signature ?? "",
         isExistingCustomer: true,
       };
     } else if (showNewClientForm) {
-      if (!newClientForm.name || !newClientForm.phone) {
+      if (!newClientForm.name?.trim() || !newClientForm.phone?.trim()) {
         toast({
           title: "Missing information",
           description: "Please enter customer name and phone number.",
@@ -211,8 +220,23 @@ export default function WalkInRegistration() {
         });
         return;
       }
+      
+      // Validate phone number format
+      const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/;
+      if (!phoneRegex.test(newClientForm.phone.trim())) {
+        toast({
+          title: "Invalid phone number",
+          description: "Please enter a valid phone number.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       clientData = {
         ...newClientForm,
+        name: newClientForm.name.trim(),
+        phone: newClientForm.phone.trim(),
+        email: newClientForm.email?.trim() ?? "",
         isExistingCustomer: false,
       };
     } else {

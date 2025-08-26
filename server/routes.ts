@@ -297,20 +297,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/appointments", async (req, res) => {
     try {
+      // Validate required fields
+      if (!req.body.customerId) {
+        return res.status(400).json({ message: "Customer ID is required" });
+      }
+      if (!req.body.serviceId) {
+        return res.status(400).json({ message: "Service ID is required" });
+      }
+      if (!req.body.date) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+      if (!req.body.time) {
+        return res.status(400).json({ message: "Time is required" });
+      }
+
       const appointmentData = insertAppointmentSchema.parse(req.body);
       const appointment = await storage.createAppointment(appointmentData);
       
       // Send confirmation email in the background
-      sendAppointmentNotification(appointment.id, 'confirmation').catch(error => {
-        console.error('Failed to send appointment confirmation:', error);
-      });
+      try {
+        await sendAppointmentNotification(appointment.id, 'confirmation');
+      } catch (notificationError) {
+        console.error('Failed to send appointment confirmation:', notificationError);
+        // Don't fail the request if notification fails
+      }
       
       res.status(201).json(appointment);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+        return res.status(400).json({ 
+          message: "Invalid appointment data", 
+          errors: error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        });
       }
-      res.status(500).json({ message: "Failed to create appointment" });
+      console.error('Create appointment error:', error);
+      res.status(500).json({ 
+        message: "Failed to create appointment",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
@@ -333,19 +360,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel appointment (set status to cancelled)
   app.patch("/api/appointments/:id/cancel", async (req, res) => {
     try {
+      if (!req.params.id) {
+        return res.status(400).json({ message: "Appointment ID is required" });
+      }
+
       const appointment = await storage.updateAppointment(req.params.id, { 
         status: "cancelled" 
       });
+      
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
       
       // Send cancellation notification in the background
-      sendAppointmentNotification(appointment.id, 'reminder').catch(error => {
-        console.error('Failed to send appointment cancellation:', error);
-      });
+      try {
+        await sendAppointmentNotification(appointment.id, 'cancellation');
+      } catch (notificationError) {
+        console.error('Failed to send appointment cancellation notification:', notificationError);
+        // Don't fail the request if notification fails
+      }
       
-      res.json({ message: "Appointment cancelled successfully", appointment });
+      res.json({ 
+        message: "Appointment cancelled successfully", 
+        appointment: {
+          ...appointment,
+          status: "cancelled"
+        }
+      });
     } catch (error) {
       console.error('Cancel appointment error:', error);
       res.status(500).json({ 

@@ -119,13 +119,15 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
   useEffect(() => {
     if (open && appointment) {
       form.reset({
-        customerId: appointment.customerId || "",
-        serviceId: appointment.serviceId || "",
-        staffId: appointment.staffId || "",
-        date: appointment.date || "",
-        time: appointment.time || "",
-        status: appointment.status || "confirmed",
-        notes: appointment.notes || "",
+        customerId: appointment.customerId ?? "",
+        serviceId: appointment.serviceId ?? "",
+        staffId: appointment.staffId ?? "",
+        date: appointment.date ?? "",
+        time: appointment.time ?? "",
+        status: appointment.status ?? "confirmed",
+        notes: appointment.notes ?? "",
+        customerNotes: appointment.customerNotes ?? "",
+        totalAmount: appointment.totalAmount ? String(appointment.totalAmount) : "",
       });
     } else if (open && !appointment) {
       form.reset({
@@ -136,6 +138,8 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
         time: "",
         status: "confirmed",
         notes: "",
+        customerNotes: "",
+        totalAmount: "",
       });
     }
   }, [open, appointment, form]);
@@ -187,17 +191,17 @@ export default function AppointmentModal({ open, onOpenChange, appointment }: Ap
               name="customerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Customer</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel>Customer *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a client" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(customers as any[]).map((client: any) => (
+                      {Array.isArray(customers) && customers.map((client: any) => (
                         <SelectItem key={client.id} value={client.id}>
-                          {client.name}
+                          {client.name} - {client.phone}
                         </SelectItem>
                       ))}
                     </SelectContent>

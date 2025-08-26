@@ -141,9 +141,11 @@ export default function NotificationSettings() {
                 <Label htmlFor="spaPhone">Business Phone (Optional)</Label>
                 <Input
                   id="spaPhone"
-                  value={formData.spaPhone || ""}
+                  value={formData.spaPhone ?? ""}
                   onChange={(e) => handleInputChange("spaPhone", e.target.value)}
                   placeholder="+63 9XX XXX XXXX"
+                  pattern="[+]?[0-9\s\-\(\)]+"
+                  title="Please enter a valid phone number"
                 />
               </div>
             </div>

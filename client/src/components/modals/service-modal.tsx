@@ -204,14 +204,18 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
                 name="duration"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Duration (minutes)</FormLabel>
+                    <FormLabel>Duration (minutes) *</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
                         min="15" 
                         step="15"
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        placeholder="60"
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? 15 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(value) ? 15 : Math.max(15, value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -223,12 +227,26 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (₱)</FormLabel>
+                    <FormLabel>Price (₱) *</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
                         min="0" 
                         step="0.01"
+                        placeholder="0.00"
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? "0" : e.target.value;
+                          const numValue = parseFloat(value);
+                          field.onChange(isNaN(numValue) ? "0" : Math.max(0, numValue).toString());
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>1"
                         placeholder="0.00"
                         {...field}
                       />
