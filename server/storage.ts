@@ -542,8 +542,8 @@ export class DatabaseStorage implements IStorage {
     // Transform array fields to comma-separated strings if needed
     const transformedProduct = {
       ...product,
-      competitors: Array.isArray(product.competitors) ? product.competitors.join(',') : product.competitors,
-      tags: Array.isArray(product.tags) ? product.tags.join(',') : product.tags
+      competitors: Array.isArray(product.competitors) ? product.competitors : (product.competitors ? product.competitors.split(',') : undefined),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? product.tags.split(',') : undefined)
     };
     const [newProduct] = await db.insert(products).values([transformedProduct]).returning();
     return newProduct;
@@ -553,8 +553,8 @@ export class DatabaseStorage implements IStorage {
     // Transform array fields to comma-separated strings if needed
     const transformedProduct = {
       ...product,
-      competitors: Array.isArray(product.competitors) ? product.competitors.join(',') : product.competitors,
-      tags: Array.isArray(product.tags) ? product.tags.join(',') : product.tags
+      competitors: Array.isArray(product.competitors) ? product.competitors : (product.competitors ? product.competitors.split(',') : undefined),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? product.tags.split(',') : undefined)
     };
     const [updatedProduct] = await db.update(products).set(transformedProduct).where(eq(products.id, id)).returning();
     return updatedProduct || undefined;
@@ -608,7 +608,7 @@ export class DatabaseStorage implements IStorage {
     // Update product stock based on transaction type
     const product = await this.getProduct(transaction.productId);
     if (product) {
-      let newStock = product.currentStock;
+      let newStock = product.currentStock || 0;
 
       switch (transaction.type) {
         case 'purchase':
@@ -648,9 +648,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
+    // Generate a unique transaction number
+    const transactionNumber = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    
+    // Type cast the items to ensure proper type matching
+    const transactionWithNumber = {
+      ...transaction,
+      transactionNumber,
+      items: transaction.items as Array<{
+        type: 'service' | 'product';
+        id: string;
+        name: string;
+        price: string;
+        quantity: number;
+        total: string;
+      }>
+    };
+    
     const [newTransaction] = await db
       .insert(transactions)
-      .values([transaction])
+      .values([transactionWithNumber])
       .returning();
     return newTransaction;
   }

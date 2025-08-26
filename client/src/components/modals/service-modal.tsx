@@ -246,15 +246,6 @@ export default function ServiceModal({ open, onOpenChange, service }: ServiceMod
                   </FormItem>
                 )}
               />
-            </div>1"
-                        placeholder="0.00"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             
             <FormField
